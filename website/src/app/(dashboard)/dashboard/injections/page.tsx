@@ -578,7 +578,7 @@ export default function InjectionsPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                         onClick={() => handleDeleteLog(log.id)}
                         aria-label={`Delete ${log.peptide} log from ${formatDate(log.date)}`}
                       >

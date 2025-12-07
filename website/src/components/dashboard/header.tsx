@@ -274,22 +274,62 @@ export function DashboardHeader({ user }: HeaderProps) {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-20 bg-slate-900/95 pt-16">
-          <nav className="p-4">
-            <ul className="space-y-2">
-              {mobileNav.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 rounded-lg"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.name}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div className="p-4">
+            {/* Mobile Search */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search protocols, peptides..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              {searchQuery && filteredSuggestions.length > 0 && (
+                <div className="absolute top-full mt-2 w-full bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
+                  <div className="max-h-60 overflow-y-auto">
+                    {filteredSuggestions.map((item, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          handleSuggestionClick(item.href)
+                          setIsMobileMenuOpen(false)
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-700 transition-colors text-left"
+                      >
+                        <span className="text-white text-sm">{item.name}</span>
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${getTypeColor(
+                            item.type
+                          )}`}
+                        >
+                          {item.type}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Navigation */}
+            <nav>
+              <ul className="space-y-2">
+                {mobileNav.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="flex items-center space-x-3 px-4 py-3 text-slate-300 hover:bg-slate-800 rounded-lg"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
       )}
     </>
