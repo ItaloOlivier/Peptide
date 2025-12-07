@@ -58,7 +58,7 @@ export default function LoginPage() {
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
               <Beaker className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">Peptide</span>
+            <span className="text-2xl font-bold text-white font-display">VitalityRx</span>
           </Link>
 
           <CardTitle className="text-2xl text-white">Welcome back</CardTitle>
@@ -121,7 +121,7 @@ export default function LoginPage() {
             <div className="mt-4 p-3 bg-slate-700/50 rounded-lg">
               <p className="text-xs text-slate-400 text-center mb-2">Demo credentials:</p>
               <p className="text-xs text-slate-300 text-center font-mono">
-                demo@peptide.app / demo123
+                demo@vitalityrx.app / demo123
               </p>
             </div>
           </form>

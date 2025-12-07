@@ -16,7 +16,7 @@ export function CTA() {
               Ready to Take Control of Your Health?
             </h2>
             <p className="text-lg text-primary-100 mb-8">
-              Join thousands of biohackers who trust Peptide to manage their protocols.
+              Join thousands of biohackers who trust VitalityRx to manage their protocols.
               Start your free trial today - no credit card required.
             </p>
 

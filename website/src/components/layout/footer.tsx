@@ -37,7 +37,7 @@ export function Footer() {
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
                 <Beaker className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">Peptide</span>
+              <span className="text-xl font-bold text-white font-display">VitalityRx</span>
             </Link>
             <p className="text-slate-400 text-sm">
               Your complete health and anti-aging management platform.
@@ -114,7 +114,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-slate-800">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-slate-400 text-sm">
-              &copy; {new Date().getFullYear()} Peptide. All rights reserved.
+              &copy; {new Date().getFullYear()} VitalityRx. All rights reserved.
             </p>
             <p className="text-slate-500 text-xs text-center md:text-right max-w-md">
               Disclaimer: This platform is for informational purposes only and does not provide medical advice.

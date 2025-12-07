@@ -77,7 +77,7 @@ export default function RegisterPage() {
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
               <Beaker className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">Peptide</span>
+            <span className="text-2xl font-bold text-white font-display">VitalityRx</span>
           </Link>
 
           <CardTitle className="text-2xl text-white">Create your account</CardTitle>
