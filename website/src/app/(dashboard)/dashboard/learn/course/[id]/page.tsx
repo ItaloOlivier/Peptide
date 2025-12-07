@@ -15,89 +15,12 @@ import {
   Lock,
   ChevronRight,
 } from 'lucide-react'
-
-// Course data (in production, fetch from API)
-const courses: Record<string, {
-  id: string
-  title: string
-  description: string
-  image: string
-  level: string
-  duration: string
-  lessons: number
-  progress: number
-  category: string
-  instructor: string
-  chapters: { title: string; duration: string; completed: boolean; locked: boolean }[]
-}> = {
-  '1': {
-    id: '1',
-    title: 'Introduction to Peptides',
-    description: 'Learn the fundamentals of peptides, how they work, and their potential benefits for health optimization. This comprehensive course covers everything from basic chemistry to practical applications.',
-    image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&h=400&fit=crop',
-    level: 'Beginner',
-    duration: '45 min',
-    lessons: 8,
-    progress: 60,
-    category: 'basics',
-    instructor: 'Dr. Sarah Chen',
-    chapters: [
-      { title: 'What are Peptides?', duration: '5 min', completed: true, locked: false },
-      { title: 'How Peptides Work in the Body', duration: '7 min', completed: true, locked: false },
-      { title: 'Types of Peptides', duration: '6 min', completed: true, locked: false },
-      { title: 'Benefits and Applications', duration: '8 min', completed: true, locked: false },
-      { title: 'Safety Considerations', duration: '5 min', completed: false, locked: false },
-      { title: 'Choosing the Right Peptide', duration: '6 min', completed: false, locked: false },
-      { title: 'Storage and Handling', duration: '4 min', completed: false, locked: true },
-      { title: 'Getting Started Safely', duration: '4 min', completed: false, locked: true },
-    ],
-  },
-  '2': {
-    id: '2',
-    title: 'Subcutaneous Injection Technique',
-    description: 'Master proper injection technique with step-by-step guidance for safe and effective administration. Learn best practices from medical professionals.',
-    image: 'https://images.unsplash.com/photo-1583912086096-8c60d75a53f9?w=800&h=400&fit=crop',
-    level: 'Beginner',
-    duration: '30 min',
-    lessons: 5,
-    progress: 100,
-    category: 'guides',
-    instructor: 'Nurse practitioner James Miller',
-    chapters: [
-      { title: 'Preparation and Supplies', duration: '5 min', completed: true, locked: false },
-      { title: 'Choosing Injection Sites', duration: '6 min', completed: true, locked: false },
-      { title: 'Step-by-Step Injection Process', duration: '8 min', completed: true, locked: false },
-      { title: 'Post-Injection Care', duration: '5 min', completed: true, locked: false },
-      { title: 'Common Mistakes to Avoid', duration: '6 min', completed: true, locked: false },
-    ],
-  },
-  '3': {
-    id: '3',
-    title: 'Peptide Safety Protocols',
-    description: 'Essential safety guidelines, storage requirements, and best practices for peptide handling. Critical knowledge for responsible use.',
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=400&fit=crop',
-    level: 'Beginner',
-    duration: '25 min',
-    lessons: 6,
-    progress: 0,
-    category: 'safety',
-    instructor: 'Dr. Michael Torres',
-    chapters: [
-      { title: 'Understanding Peptide Purity', duration: '4 min', completed: false, locked: false },
-      { title: 'Storage Requirements', duration: '5 min', completed: false, locked: false },
-      { title: 'Reconstitution Safety', duration: '5 min', completed: false, locked: true },
-      { title: 'Dosing Guidelines', duration: '4 min', completed: false, locked: true },
-      { title: 'Side Effects and Warning Signs', duration: '4 min', completed: false, locked: true },
-      { title: 'When to Seek Medical Help', duration: '3 min', completed: false, locked: true },
-    ],
-  },
-}
-
-const levelColors: Record<string, string> = {
-  'Beginner': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  'Intermediate': 'bg-secondary-500/10 text-secondary-400 border-secondary-500/20',
-  'Advanced': 'bg-accent-500/10 text-accent-400 border-accent-500/20',
-}
+import {
+  courses,
+  levelColors,
+  getChaptersWithLockStatus,
+  calculateCourseProgress,
+} from '@/data/courses'
 
 export default function CourseDetailPage() {
   const params = useParams()
@@ -119,14 +42,17 @@ export default function CourseDetailPage() {
     )
   }
 
+  // Get chapters with dynamically calculated lock status
+  const chaptersWithLockStatus = getChaptersWithLockStatus(course.chapters)
   const completedLessons = course.chapters.filter(c => c.completed).length
+  const progress = calculateCourseProgress(course.chapters)
 
   // Find the next incomplete lesson (for Continue button)
-  const nextLessonIndex = course.chapters.findIndex(c => !c.completed && !c.locked)
+  const nextLessonIndex = chaptersWithLockStatus.findIndex(c => !c.completed && !c.locked)
   const startLessonIndex = nextLessonIndex >= 0 ? nextLessonIndex : 0
 
   const handleChapterClick = (index: number) => {
-    const chapter = course.chapters[index]
+    const chapter = chaptersWithLockStatus[index]
     if (!chapter.locked) {
       router.push(`/dashboard/learn/course/${courseId}/lesson/${index}`)
     }
@@ -198,8 +124,8 @@ export default function CourseDetailPage() {
         <Card className="bg-slate-800/50 border-slate-700/50">
           <CardContent className="p-4">
             <p className="text-sm text-slate-400 mb-1">Progress</p>
-            <p className="font-semibold text-white mb-2">{course.progress}%</p>
-            <Progress value={course.progress} className="h-1" />
+            <p className="font-semibold text-white mb-2">{progress}%</p>
+            <Progress value={progress} className="h-1" />
           </CardContent>
         </Card>
       </div>
@@ -216,7 +142,7 @@ export default function CourseDetailPage() {
       <div>
         <h2 className="text-xl font-semibold text-white mb-4">Course Content</h2>
         <div className="space-y-2">
-          {course.chapters.map((chapter, index) => (
+          {chaptersWithLockStatus.map((chapter, index) => (
             <Card
               key={index}
               onClick={() => handleChapterClick(index)}
@@ -273,7 +199,7 @@ export default function CourseDetailPage() {
           onClick={handleStartContinue}
         >
           <Play className="w-5 h-5 mr-2" />
-          {course.progress > 0 ? 'Continue Course' : 'Start Course'}
+          {progress > 0 ? 'Continue Course' : 'Start Course'}
         </Button>
       </div>
     </div>
