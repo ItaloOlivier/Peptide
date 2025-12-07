@@ -1,9 +1,8 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "cd website && npm ci && npm run build"
+watchPatterns = ["website/**"]
 
 [deploy]
-startCommand = "cd website && npm run start"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"

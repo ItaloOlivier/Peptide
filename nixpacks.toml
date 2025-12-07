@@ -1,0 +1,14 @@
+# Nixpacks configuration for Railway deployment
+# This tells Nixpacks to use Node.js even though package.json is in a subdirectory
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "npm"]
+
+[phases.install]
+cmds = ["cd website && npm ci"]
+
+[phases.build]
+cmds = ["cd website && npm run build"]
+
+[start]
+cmd = "cd website && npm run start"
