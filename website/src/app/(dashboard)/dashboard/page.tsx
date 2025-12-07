@@ -20,7 +20,6 @@ import {
   Trophy,
   Star,
   Award,
-  Heart,
   Sparkles,
   ArrowRight,
   CheckCircle2,
@@ -56,24 +55,25 @@ const mockData = {
     startWeight: 195,
     currentWeight: 185.2,
     goalWeight: 175,
+    weeklyLossRate: 1.5, // lbs per week for projection calculation
   },
   nextInjection: {
     peptide: 'Semaglutide',
     dosage: '0.5mg',
     timeUntil: '2h 30m',
     site: 'Abdomen - Left',
-    isUrgent: true,
   },
   weeklyStats: {
     weight: { value: -2.3, unit: 'lbs', trend: 'down' },
     energy: { value: 7.5, max: 10, improvement: 15 },
     injections: { completed: 5, total: 6 },
   },
-  achievements: [
-    { id: 1, name: 'First Week', icon: '🎯', earned: true },
-    { id: 2, name: '10 Day Streak', icon: '🔥', earned: true },
-    { id: 3, name: '5lbs Lost', icon: '⚡', earned: true },
-    { id: 4, name: '30 Day Warrior', icon: '👑', earned: false, progress: 40 },
+  // Achievements with target days for progress calculation
+  achievementDefs: [
+    { id: 1, name: 'First Week', icon: '🎯', targetDays: 7 },
+    { id: 2, name: '10 Day Streak', icon: '🔥', targetDays: 10 },
+    { id: 3, name: '5lbs Lost', icon: '⚡', targetLbs: 5 },
+    { id: 4, name: '30 Day Warrior', icon: '👑', targetDays: 30 },
   ],
   recentLogs: [
     { type: 'injection', peptide: 'BPC-157', dosage: '250mcg', time: '2 hours ago' },
@@ -85,12 +85,73 @@ const mockData = {
     totalWeightLost: 12450,
     avgEnergyIncrease: 34,
   },
-  milestones: [
-    { weight: 190, label: '-5 lbs', reached: true },
-    { weight: 185, label: '-10 lbs', reached: true },
-    { weight: 180, label: '-15 lbs', reached: false },
-    { weight: 175, label: 'Goal!', reached: false },
-  ],
+}
+
+// Helper: Parse time string like "2h 30m" to minutes
+function parseTimeToMinutes(timeStr: string): number {
+  const hourMatch = timeStr.match(/(\d+)h/)
+  const minMatch = timeStr.match(/(\d+)m/)
+  const hours = hourMatch ? parseInt(hourMatch[1]) : 0
+  const minutes = minMatch ? parseInt(minMatch[1]) : 0
+  return hours * 60 + minutes
+}
+
+// Helper: Check if injection is urgent (less than 4 hours away)
+function isInjectionUrgent(timeUntil: string): boolean {
+  const minutes = parseTimeToMinutes(timeUntil)
+  return minutes > 0 && minutes <= 240 // 4 hours = 240 minutes
+}
+
+// Helper: Calculate milestones dynamically
+function calculateMilestones(startWeight: number, currentWeight: number, goalWeight: number) {
+  const totalToLose = startWeight - goalWeight
+  const milestoneSteps = [0.25, 0.5, 0.75, 1] // 25%, 50%, 75%, Goal
+
+  return milestoneSteps.map((step, index) => {
+    const targetWeight = startWeight - (totalToLose * step)
+    const label = index === 3 ? 'Goal!' : `-${Math.round(totalToLose * step)} lbs`
+    const reached = currentWeight <= targetWeight
+    return { weight: targetWeight, label, reached }
+  })
+}
+
+// Helper: Calculate achievements with dynamic progress
+function calculateAchievements(
+  currentStreak: number,
+  weightLost: number,
+  achievementDefs: typeof mockData.achievementDefs
+) {
+  return achievementDefs.map(def => {
+    let earned = false
+    let progress: number | undefined = undefined
+
+    if (def.targetDays) {
+      earned = currentStreak >= def.targetDays
+      if (!earned) {
+        progress = Math.min(100, Math.round((currentStreak / def.targetDays) * 100))
+      }
+    } else if (def.targetLbs) {
+      earned = weightLost >= def.targetLbs
+      if (!earned) {
+        progress = Math.min(100, Math.round((weightLost / def.targetLbs) * 100))
+      }
+    }
+
+    return {
+      id: def.id,
+      name: def.name,
+      icon: def.icon,
+      earned,
+      progress,
+    }
+  })
+}
+
+// Helper: Calculate projected weeks to goal
+function calculateProjectedWeeks(currentWeight: number, goalWeight: number, weeklyLossRate: number): number {
+  const remainingToLose = currentWeight - goalWeight
+  if (remainingToLose <= 0 || weeklyLossRate <= 0) return 0
+  return Math.ceil(remainingToLose / weeklyLossRate)
 }
 
 // Motivational quotes
@@ -127,12 +188,16 @@ export default function DashboardPage() {
   const [quote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)])
   const [showCelebration, setShowCelebration] = useState(false)
 
+  // Milestone streaks that trigger celebration
+  const milestoneStreaks = [7, 14, 21, 30, 60, 90, 100]
+
   // Show celebration animation on first load if streak milestone
   useEffect(() => {
-    if (mockData.user.currentStreak === 10 || mockData.user.currentStreak === 30) {
+    if (milestoneStreaks.includes(mockData.user.currentStreak)) {
       setShowCelebration(true)
       setTimeout(() => setShowCelebration(false), 3000)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleLogInjection = (peptide?: string) => {
@@ -140,9 +205,41 @@ export default function DashboardPage() {
     setIsInjectionModalOpen(true)
   }
 
-  // Calculate weight loss progress
-  const weightLossProgress = ((mockData.activeProtocol.startWeight - mockData.activeProtocol.currentWeight) /
+  // Calculate weight loss progress (capped at 100%)
+  const rawWeightLossProgress = ((mockData.activeProtocol.startWeight - mockData.activeProtocol.currentWeight) /
     (mockData.activeProtocol.startWeight - mockData.activeProtocol.goalWeight)) * 100
+  const weightLossProgress = Math.min(100, Math.max(0, rawWeightLossProgress))
+
+  // Calculate weight lost for achievements
+  const weightLost = mockData.activeProtocol.startWeight - mockData.activeProtocol.currentWeight
+
+  // Calculate dynamic milestones
+  const milestones = calculateMilestones(
+    mockData.activeProtocol.startWeight,
+    mockData.activeProtocol.currentWeight,
+    mockData.activeProtocol.goalWeight
+  )
+
+  // Calculate achievements with dynamic progress
+  const achievements = calculateAchievements(
+    mockData.user.currentStreak,
+    weightLost,
+    mockData.achievementDefs
+  )
+
+  // Calculate if next injection is urgent
+  const isNextInjectionUrgent = isInjectionUrgent(mockData.nextInjection.timeUntil)
+
+  // Calculate projected weeks to goal
+  const projectedWeeks = calculateProjectedWeeks(
+    mockData.activeProtocol.currentWeight,
+    mockData.activeProtocol.goalWeight,
+    mockData.activeProtocol.weeklyLossRate
+  )
+
+  // Calculate XP progress percentage
+  const xpProgress = (mockData.user.xp / mockData.user.nextLevelXp) * 100
+  const xpToNextLevel = mockData.user.nextLevelXp - mockData.user.xp
 
   return (
     <>
@@ -222,7 +319,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Urgent Action Card - Loss Aversion Hook */}
-        {mockData.nextInjection.isUrgent && (
+        {isNextInjectionUrgent && (
           <Card className="bg-gradient-to-r from-accent-500/20 to-accent-600/10 border-accent-500/50 animate-pulse-subtle">
             <CardContent className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -236,7 +333,7 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   <div>
-                    <p className="text-accent-300 font-medium text-sm">Don't break your streak!</p>
+                    <p className="text-accent-300 font-medium text-sm">Upcoming injection reminder</p>
                     <p className="text-white text-lg font-semibold">
                       {mockData.nextInjection.peptide} due in {mockData.nextInjection.timeUntil}
                     </p>
@@ -250,7 +347,7 @@ export default function DashboardPage() {
                   onClick={() => handleLogInjection(mockData.nextInjection.peptide)}
                 >
                   <Syringe className="w-4 h-4 mr-2" />
-                  Log Now & Keep Streak
+                  Log Now
                 </Button>
               </div>
             </CardContent>
@@ -285,7 +382,7 @@ export default function DashboardPage() {
               </div>
               {/* Milestone dots */}
               <div className="flex justify-between mt-3">
-                {mockData.milestones.map((milestone, i) => (
+                {milestones.map((milestone, i) => (
                   <div key={i} className="flex flex-col items-center">
                     <div className={`w-3 h-3 rounded-full ${
                       milestone.reached ? 'bg-emerald-400' : 'bg-slate-600'
@@ -369,7 +466,7 @@ export default function DashboardPage() {
                 </div>
                 <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20">
                   <Sparkles className="w-3 h-3 mr-1" />
-                  Level Up Soon!
+                  {xpProgress >= 90 ? 'Almost There!' : xpProgress >= 50 ? 'Halfway!' : 'Keep Going!'}
                 </Badge>
               </div>
               <p className="text-sm text-slate-400 mb-1">Experience Points</p>
@@ -378,12 +475,12 @@ export default function DashboardPage() {
                 <span className="text-lg text-slate-500">/{mockData.user.nextLevelXp} XP</span>
               </p>
               <Progress
-                value={(mockData.user.xp / mockData.user.nextLevelXp) * 100}
+                value={xpProgress}
                 size="sm"
                 className="mt-3"
               />
               <p className="text-xs text-purple-400 mt-2">
-                🎮 {mockData.user.nextLevelXp - mockData.user.xp} XP to next level!
+                🎮 {xpToNextLevel} XP to next level!
               </p>
             </CardContent>
           </Card>
@@ -396,14 +493,14 @@ export default function DashboardPage() {
               <Award className="w-5 h-5 text-secondary-400" />
               <CardTitle className="text-lg">Your Achievements</CardTitle>
             </div>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard/achievements')}>
               View All
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {mockData.achievements.map((achievement) => (
+              {achievements.map((achievement) => (
                 <div
                   key={achievement.id}
                   className={`relative p-4 rounded-xl text-center transition-all ${
@@ -486,7 +583,11 @@ export default function DashboardPage() {
                   <span className="font-medium text-emerald-400">Projected Results</span>
                 </div>
                 <p className="text-slate-300">
-                  At your current pace, you'll reach <span className="text-emerald-400 font-semibold">{mockData.activeProtocol.goalWeight} lbs</span> in approximately <span className="text-emerald-400 font-semibold">6 weeks</span>. Keep it up!
+                  {projectedWeeks > 0 ? (
+                    <>At your current pace, you'll reach <span className="text-emerald-400 font-semibold">{mockData.activeProtocol.goalWeight} lbs</span> in approximately <span className="text-emerald-400 font-semibold">{projectedWeeks} week{projectedWeeks !== 1 ? 's' : ''}</span>. Keep it up!</>
+                  ) : (
+                    <>Congratulations! You've reached your goal of <span className="text-emerald-400 font-semibold">{mockData.activeProtocol.goalWeight} lbs</span>!</>
+                  )}
                 </p>
               </div>
             </CardContent>
@@ -626,7 +727,7 @@ export default function DashboardPage() {
               <p className="text-sm font-medium text-amber-300">Daily Tip</p>
               <p className="text-slate-300">Injecting in the morning can help optimize your body's natural hormone cycles. Try rotating sites: abdomen → thigh → arm.</p>
             </div>
-            <Button variant="ghost" size="sm" className="text-amber-400 shrink-0">
+            <Button variant="ghost" size="sm" className="text-amber-400 shrink-0" onClick={() => router.push('/dashboard/learn')}>
               Learn More
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
