@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -15,7 +16,6 @@ import {
   Beaker,
   Clock,
   ChevronRight,
-  Star,
   CheckCircle,
   AlertTriangle,
   Syringe,
@@ -23,6 +23,7 @@ import {
   Brain,
   Dumbbell,
   Sparkles,
+  Bell,
 } from 'lucide-react'
 
 // Educational images from Unsplash
@@ -193,15 +194,53 @@ const levelColors: Record<string, string> = {
 }
 
 export default function LearnPage() {
+  const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [notificationRequested, setNotificationRequested] = useState(false)
 
-  const filteredGuides = quickGuides.filter(guide => {
-    const matchesCategory = selectedCategory === 'all' || guide.category === selectedCategory
-    const matchesSearch = guide.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          guide.description.toLowerCase().includes(searchQuery.toLowerCase())
+  // Filter function that checks if content matches search and category
+  const matchesFilters = (item: { title?: string; name?: string; description: string; category: string }) => {
+    const title = item.title || item.name || ''
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
+    const matchesSearch = searchQuery === '' ||
+      title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesCategory && matchesSearch
+  }
+
+  // Filter all content sections
+  const filteredCourses = featuredCourses.filter(matchesFilters)
+  const filteredPeptides = peptideGuides.filter(guide => {
+    const matchesCategory = selectedCategory === 'all' ||
+      (selectedCategory === 'basics' && guide.difficulty === 'Beginner') ||
+      (selectedCategory === 'research' && guide.difficulty === 'Advanced')
+    const matchesSearch = searchQuery === '' ||
+      guide.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      guide.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      guide.topics.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
     return matchesCategory && matchesSearch
   })
+  const filteredGuides = quickGuides.filter(matchesFilters)
+
+  // Navigation handlers
+  const handleCourseClick = (courseId: string) => {
+    router.push(`/dashboard/learn/course/${courseId}`)
+  }
+
+  const handlePeptideClick = (peptideId: string) => {
+    router.push(`/dashboard/learn/peptide/${peptideId}`)
+  }
+
+  const handleGuideClick = (guideId: string) => {
+    router.push(`/dashboard/learn/guide/${guideId}`)
+  }
+
+  const handleNotifyClick = () => {
+    setNotificationRequested(true)
+    // In production, this would save to database/send to API
+    setTimeout(() => setNotificationRequested(false), 3000)
+  }
 
   return (
     <div className="space-y-8">
@@ -242,16 +281,17 @@ export default function LearnPage() {
       </div>
 
       {/* Featured Courses */}
+      {filteredCourses.length > 0 && (
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Featured Courses</h2>
-          <Button variant="ghost" size="sm" className="text-primary-400">
+          <Button variant="ghost" size="sm" className="text-primary-400" onClick={() => router.push('/dashboard/learn/courses')}>
             View All <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredCourses.map((course) => (
-            <Card key={course.id} className="bg-slate-800/50 border-slate-700/50 hover:border-primary-500/50 transition-all overflow-hidden group cursor-pointer">
+          {filteredCourses.map((course) => (
+            <Card key={course.id} className="bg-slate-800/50 border-slate-700/50 hover:border-primary-500/50 transition-all overflow-hidden group cursor-pointer" onClick={() => handleCourseClick(course.id)}>
               <div className="relative h-40 bg-slate-700 overflow-hidden">
                 <Image
                   src={course.image}
@@ -292,18 +332,20 @@ export default function LearnPage() {
           ))}
         </div>
       </section>
+      )}
 
       {/* Peptide Encyclopedia */}
+      {filteredPeptides.length > 0 && (
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Peptide Encyclopedia</h2>
-          <Button variant="ghost" size="sm" className="text-primary-400">
+          <Button variant="ghost" size="sm" className="text-primary-400" onClick={() => router.push('/dashboard/learn/peptides')}>
             View All <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {peptideGuides.map((peptide) => (
-            <Card key={peptide.id} className="bg-slate-800/50 border-slate-700/50 hover:border-primary-500/50 transition-all cursor-pointer">
+          {filteredPeptides.map((peptide) => (
+            <Card key={peptide.id} className="bg-slate-800/50 border-slate-700/50 hover:border-primary-500/50 transition-all cursor-pointer" onClick={() => handlePeptideClick(peptide.id)}>
               <CardContent className="p-4">
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 rounded-lg bg-primary-500/10 flex items-center justify-center flex-shrink-0">
@@ -318,9 +360,16 @@ export default function LearnPage() {
                     <p className="text-sm text-slate-400 mb-3">{peptide.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {peptide.topics.map((topic) => (
-                        <span key={topic} className="text-xs px-2 py-1 bg-slate-700/50 text-slate-400 rounded">
+                        <button
+                          key={topic}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSearchQuery(topic)
+                          }}
+                          className="text-xs px-2 py-1 bg-slate-700/50 text-slate-400 rounded hover:bg-slate-600/50 hover:text-white transition-colors"
+                        >
                           {topic}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -330,6 +379,7 @@ export default function LearnPage() {
           ))}
         </div>
       </section>
+      )}
 
       {/* Safety Tips */}
       <section>
@@ -350,6 +400,7 @@ export default function LearnPage() {
       </section>
 
       {/* Quick Guides */}
+      {filteredGuides.length > 0 && (
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Quick Guides</h2>
@@ -357,14 +408,14 @@ export default function LearnPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredGuides.map((guide) => (
-            <Card key={guide.id} className="bg-slate-800/50 border-slate-700/50 hover:border-primary-500/50 transition-all cursor-pointer">
+            <Card key={guide.id} className="bg-slate-800/50 border-slate-700/50 hover:border-primary-500/50 transition-all cursor-pointer group" onClick={() => handleGuideClick(guide.id)}>
               <CardContent className="p-4">
                 <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 rounded-lg bg-slate-700/50 flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-5 h-5 text-slate-400" />
+                  <div className="w-10 h-10 rounded-lg bg-slate-700/50 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-500/10 transition-colors">
+                    <FileText className="w-5 h-5 text-slate-400 group-hover:text-primary-400 transition-colors" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-white mb-1 group-hover:text-primary-400">
+                    <h3 className="font-medium text-white mb-1 group-hover:text-primary-400 transition-colors">
                       {guide.title}
                     </h3>
                     <p className="text-sm text-slate-400 mb-2 line-clamp-2">{guide.description}</p>
@@ -376,6 +427,7 @@ export default function LearnPage() {
           ))}
         </div>
       </section>
+      )}
 
       {/* Video Section Teaser */}
       <section>
@@ -391,8 +443,23 @@ export default function LearnPage() {
                   <p className="text-slate-400">Watch step-by-step guides from experts</p>
                 </div>
               </div>
-              <Button variant="outline" className="border-primary-500/50 text-primary-400 hover:bg-primary-500/10">
-                Get Notified
+              <Button
+                variant="outline"
+                className={`border-primary-500/50 text-primary-400 hover:bg-primary-500/10 ${notificationRequested ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : ''}`}
+                onClick={handleNotifyClick}
+                disabled={notificationRequested}
+              >
+                {notificationRequested ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Subscribed!
+                  </>
+                ) : (
+                  <>
+                    <Bell className="w-4 h-4 mr-2" />
+                    Get Notified
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
