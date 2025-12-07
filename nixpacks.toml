@@ -2,7 +2,7 @@
 # This tells Nixpacks to use Node.js even though package.json is in a subdirectory
 
 [phases.setup]
-nixPkgs = ["nodejs_20", "npm"]
+nixPkgs = ["nodejs_20"]
 
 [phases.install]
 cmds = ["cd website && npm ci"]
