@@ -1121,17 +1121,24 @@ ${peptideAmount}mg peptide + ${waterVolume}ml water`
                           : 'bg-amber-500/10 border border-amber-500/20'
                       }`}>
                         <p className="text-sm">
-                          {Math.abs(calculations.penDoseAccuracy - 100) <= 5 ? (
-                            <span className="text-emerald-400">
-                              <CheckCircle2 className="w-4 h-4 inline mr-1" />
-                              Accurate dose: {calculations.penClicksRounded} clicks = {(calculations.penClicksRounded * calculations.mlPerClick * calculations.concentrationMcgMl).toFixed(1)} {doseUnit}
-                            </span>
-                          ) : (
-                            <span className="text-amber-400">
-                              <AlertTriangle className="w-4 h-4 inline mr-1" />
-                              {calculations.penClicksRounded} clicks delivers {(calculations.penClicksRounded * calculations.mlPerClick * calculations.concentrationMcgMl).toFixed(1)} {doseUnit} ({calculations.penDoseAccuracy.toFixed(0)}% of target)
-                            </span>
-                          )}
+                          {(() => {
+                            // Calculate actual dose in mcg then convert to display unit
+                            const actualDoseMcg = calculations.penClicksRounded * calculations.mlPerClick * calculations.concentrationMcgMl
+                            const displayDose = doseUnit === 'mg' ? actualDoseMcg / 1000 : actualDoseMcg
+                            const displayDecimals = doseUnit === 'mg' ? 2 : 0
+
+                            return Math.abs(calculations.penDoseAccuracy - 100) <= 5 ? (
+                              <span className="text-emerald-400">
+                                <CheckCircle2 className="w-4 h-4 inline mr-1" />
+                                Accurate dose: {calculations.penClicksRounded} clicks = {displayDose.toFixed(displayDecimals)} {doseUnit}
+                              </span>
+                            ) : (
+                              <span className="text-amber-400">
+                                <AlertTriangle className="w-4 h-4 inline mr-1" />
+                                {calculations.penClicksRounded} clicks delivers {displayDose.toFixed(displayDecimals)} {doseUnit} ({calculations.penDoseAccuracy.toFixed(0)}% of target)
+                              </span>
+                            )
+                          })()}
                         </p>
                       </div>
                     </div>
