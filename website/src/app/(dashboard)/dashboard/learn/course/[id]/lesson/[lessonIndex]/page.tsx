@@ -16,7 +16,8 @@ import {
   ChevronRight as ChevronRightIcon,
   Lock,
 } from 'lucide-react'
-import { courses, isChapterLocked } from '@/data/courses'
+import { courses } from '@/data/courses'
+import { useCourseProgress } from '@/hooks/useCourseProgress'
 
 export default function LessonPage() {
   const params = useParams()
@@ -28,6 +29,13 @@ export default function LessonPage() {
 
   const course = courses[courseId]
   const chapter = course?.chapters[lessonIndex]
+
+  const {
+    isLoaded,
+    markChapterComplete,
+    isChapterLocked,
+    isChapterCompleted,
+  } = useCourseProgress(courseId)
 
   if (!course || !chapter) {
     return (
@@ -42,8 +50,17 @@ export default function LessonPage() {
     )
   }
 
-  // Check if this lesson is locked using the dynamic function
-  const isLocked = isChapterLocked(course.chapters, lessonIndex)
+  // Show loading state until localStorage is read
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-pulse text-slate-400">Loading lesson...</div>
+      </div>
+    )
+  }
+
+  // Check if this lesson is locked using the progress hook
+  const isLocked = isChapterLocked(lessonIndex)
 
   if (isLocked) {
     return (
@@ -64,9 +81,8 @@ export default function LessonPage() {
   const isLastSection = currentSection === totalSections - 1
   const isFirstSection = currentSection === 0
 
-  // Check if next lesson exists and is not locked
-  const hasNextLesson = lessonIndex < course.chapters.length - 1 &&
-    !isChapterLocked(course.chapters, lessonIndex + 1)
+  // Check if next lesson exists and would be unlocked after completing this one
+  const hasNextLesson = lessonIndex < course.chapters.length - 1
   const hasPrevLesson = lessonIndex > 0
 
   const handleNext = () => {
@@ -82,7 +98,10 @@ export default function LessonPage() {
   }
 
   const handleComplete = () => {
-    // In production, would save progress to database
+    // Mark this chapter as complete in localStorage
+    markChapterComplete(lessonIndex)
+
+    // Navigate to next lesson or back to course
     if (hasNextLesson) {
       router.push(`/dashboard/learn/course/${courseId}/lesson/${lessonIndex + 1}`)
     } else {
@@ -91,6 +110,9 @@ export default function LessonPage() {
   }
 
   const currentContent = chapter.content[currentSection]
+
+  // Check if next lesson is accessible (will be unlocked after this one completes)
+  const nextLessonAccessible = hasNextLesson && !isChapterLocked(lessonIndex + 1)
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -122,6 +144,12 @@ export default function LessonPage() {
             <BookOpen className="w-4 h-4" />
             {totalSections} sections
           </span>
+          {isChapterCompleted(lessonIndex) && (
+            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Completed
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -182,7 +210,7 @@ export default function LessonPage() {
           >
             {hasNextLesson ? (
               <>
-                Next Lesson
+                Complete & Next Lesson
                 <ArrowRight className="w-4 h-4 ml-2" />
               </>
             ) : (
@@ -218,13 +246,19 @@ export default function LessonPage() {
               )}
             </div>
             <div>
-              {hasNextLesson && (
+              {hasNextLesson && nextLessonAccessible && (
                 <button
                   onClick={() => router.push(`/dashboard/learn/course/${courseId}/lesson/${lessonIndex + 1}`)}
                   className="text-sm text-slate-400 hover:text-white transition-colors"
                 >
                   Next: {course.chapters[lessonIndex + 1].title} →
                 </button>
+              )}
+              {hasNextLesson && !nextLessonAccessible && (
+                <span className="text-sm text-slate-500 flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  Next: {course.chapters[lessonIndex + 1].title}
+                </span>
               )}
             </div>
           </div>

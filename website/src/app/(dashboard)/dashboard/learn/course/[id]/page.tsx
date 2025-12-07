@@ -15,12 +15,8 @@ import {
   Lock,
   ChevronRight,
 } from 'lucide-react'
-import {
-  courses,
-  levelColors,
-  getChaptersWithLockStatus,
-  calculateCourseProgress,
-} from '@/data/courses'
+import { courses, levelColors } from '@/data/courses'
+import { useCourseProgress } from '@/hooks/useCourseProgress'
 
 export default function CourseDetailPage() {
   const params = useParams()
@@ -28,6 +24,12 @@ export default function CourseDetailPage() {
   const courseId = params.id as string
 
   const course = courses[courseId]
+  const {
+    isLoaded,
+    getChaptersWithProgress,
+    calculateProgress,
+    getCompletedCount,
+  } = useCourseProgress(courseId)
 
   if (!course) {
     return (
@@ -42,17 +44,17 @@ export default function CourseDetailPage() {
     )
   }
 
-  // Get chapters with dynamically calculated lock status
-  const chaptersWithLockStatus = getChaptersWithLockStatus(course.chapters)
-  const completedLessons = course.chapters.filter(c => c.completed).length
-  const progress = calculateCourseProgress(course.chapters)
+  // Get chapters with dynamically calculated lock and completion status from localStorage
+  const chaptersWithProgress = getChaptersWithProgress()
+  const completedLessons = getCompletedCount()
+  const progress = calculateProgress()
 
   // Find the next incomplete lesson (for Continue button)
-  const nextLessonIndex = chaptersWithLockStatus.findIndex(c => !c.completed && !c.locked)
+  const nextLessonIndex = chaptersWithProgress.findIndex(c => !c.completed && !c.locked)
   const startLessonIndex = nextLessonIndex >= 0 ? nextLessonIndex : 0
 
   const handleChapterClick = (index: number) => {
-    const chapter = chaptersWithLockStatus[index]
+    const chapter = chaptersWithProgress[index]
     if (!chapter.locked) {
       router.push(`/dashboard/learn/course/${courseId}/lesson/${index}`)
     }
@@ -60,6 +62,15 @@ export default function CourseDetailPage() {
 
   const handleStartContinue = () => {
     router.push(`/dashboard/learn/course/${courseId}/lesson/${startLessonIndex}`)
+  }
+
+  // Show loading state until localStorage is read
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-pulse text-slate-400">Loading course...</div>
+      </div>
+    )
   }
 
   return (
@@ -142,7 +153,7 @@ export default function CourseDetailPage() {
       <div>
         <h2 className="text-xl font-semibold text-white mb-4">Course Content</h2>
         <div className="space-y-2">
-          {chaptersWithLockStatus.map((chapter, index) => (
+          {chaptersWithProgress.map((chapter, index) => (
             <Card
               key={index}
               onClick={() => handleChapterClick(index)}
@@ -193,14 +204,25 @@ export default function CourseDetailPage() {
 
       {/* Continue Button */}
       <div className="flex justify-center pt-4">
-        <Button
-          size="lg"
-          className="bg-primary-500 hover:bg-primary-600"
-          onClick={handleStartContinue}
-        >
-          <Play className="w-5 h-5 mr-2" />
-          {progress > 0 ? 'Continue Course' : 'Start Course'}
-        </Button>
+        {progress === 100 ? (
+          <Button
+            size="lg"
+            className="bg-emerald-500 hover:bg-emerald-600"
+            onClick={() => router.push('/dashboard/learn')}
+          >
+            <CheckCircle className="w-5 h-5 mr-2" />
+            Course Completed!
+          </Button>
+        ) : (
+          <Button
+            size="lg"
+            className="bg-primary-500 hover:bg-primary-600"
+            onClick={handleStartContinue}
+          >
+            <Play className="w-5 h-5 mr-2" />
+            {progress > 0 ? 'Continue Course' : 'Start Course'}
+          </Button>
+        )}
       </div>
     </div>
   )
