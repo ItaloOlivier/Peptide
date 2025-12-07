@@ -20,8 +20,8 @@ const navigation = [
   { name: 'Protocols', href: '/dashboard/protocols', icon: ClipboardList },
   { name: 'Injections', href: '/dashboard/injections', icon: Syringe },
   { name: 'Health Tracking', href: '/dashboard/tracking', icon: Activity },
-  { name: 'Shop', href: '/shop', icon: ShoppingBag },
-  { name: 'Learn', href: '/learn', icon: BookOpen },
+  { name: 'Shop', href: '/dashboard/shop', icon: ShoppingBag },
+  { name: 'Learn', href: '/dashboard/learn', icon: BookOpen },
 ]
 
 const secondaryNavigation = [
