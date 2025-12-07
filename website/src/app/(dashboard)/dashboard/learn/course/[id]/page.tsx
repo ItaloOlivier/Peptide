@@ -121,6 +121,21 @@ export default function CourseDetailPage() {
 
   const completedLessons = course.chapters.filter(c => c.completed).length
 
+  // Find the next incomplete lesson (for Continue button)
+  const nextLessonIndex = course.chapters.findIndex(c => !c.completed && !c.locked)
+  const startLessonIndex = nextLessonIndex >= 0 ? nextLessonIndex : 0
+
+  const handleChapterClick = (index: number) => {
+    const chapter = course.chapters[index]
+    if (!chapter.locked) {
+      router.push(`/dashboard/learn/course/${courseId}/lesson/${index}`)
+    }
+  }
+
+  const handleStartContinue = () => {
+    router.push(`/dashboard/learn/course/${courseId}/lesson/${startLessonIndex}`)
+  }
+
   return (
     <div className="space-y-6">
       {/* Back Button */}
@@ -204,12 +219,17 @@ export default function CourseDetailPage() {
           {course.chapters.map((chapter, index) => (
             <Card
               key={index}
+              onClick={() => handleChapterClick(index)}
               className={`border-slate-700/50 transition-all ${
                 chapter.locked
-                  ? 'bg-slate-800/30 opacity-60'
-                  : chapter.completed
-                    ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40'
-                    : 'bg-slate-800/50 hover:border-primary-500/50 cursor-pointer'
+                  ? 'bg-slate-800/30 opacity-60 cursor-not-allowed'
+                  : 'cursor-pointer hover:border-primary-500/50'
+              } ${
+                chapter.completed
+                  ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40'
+                  : chapter.locked
+                    ? ''
+                    : 'bg-slate-800/50'
               }`}
             >
               <CardContent className="p-4 flex items-center justify-between">
@@ -247,7 +267,11 @@ export default function CourseDetailPage() {
 
       {/* Continue Button */}
       <div className="flex justify-center pt-4">
-        <Button size="lg" className="bg-primary-500 hover:bg-primary-600">
+        <Button
+          size="lg"
+          className="bg-primary-500 hover:bg-primary-600"
+          onClick={handleStartContinue}
+        >
           <Play className="w-5 h-5 mr-2" />
           {course.progress > 0 ? 'Continue Course' : 'Start Course'}
         </Button>
