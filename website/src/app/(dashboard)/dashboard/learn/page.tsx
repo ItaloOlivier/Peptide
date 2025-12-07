@@ -109,7 +109,7 @@ const peptideGuides = [
     difficulty: 'Intermediate',
   },
   {
-    id: 'ghkcu',
+    id: 'ghk-cu',
     name: 'GHK-Cu',
     category: 'Skin & Anti-Aging',
     icon: Sparkles,
@@ -121,46 +121,32 @@ const peptideGuides = [
 
 const quickGuides = [
   {
-    id: '1',
+    id: 'reconstitution',
     title: 'How to Reconstitute Peptides',
     description: 'Step-by-step guide for properly mixing lyophilized peptides with bacteriostatic water.',
     readTime: '5 min read',
     category: 'guides',
   },
   {
-    id: '2',
+    id: 'storage',
     title: 'Proper Storage Guidelines',
     description: 'Temperature requirements, light exposure, and shelf life for different peptide types.',
     readTime: '4 min read',
     category: 'safety',
   },
   {
-    id: '3',
+    id: 'dosing-basics',
     title: 'Calculating Peptide Dosages',
     description: 'Learn how to calculate accurate dosages based on peptide concentration and desired dose.',
     readTime: '6 min read',
     category: 'guides',
   },
   {
-    id: '4',
+    id: 'injection-sites',
     title: 'Injection Site Rotation',
     description: 'Best practices for rotating injection sites to prevent tissue irritation and ensure absorption.',
     readTime: '3 min read',
     category: 'guides',
-  },
-  {
-    id: '5',
-    title: 'Understanding Peptide Purity',
-    description: 'How to read lab test results and what purity levels mean for safety and efficacy.',
-    readTime: '5 min read',
-    category: 'safety',
-  },
-  {
-    id: '6',
-    title: 'Common Side Effects',
-    description: 'What to expect, when to be concerned, and how to manage common peptide side effects.',
-    readTime: '7 min read',
-    category: 'safety',
   },
 ]
 
