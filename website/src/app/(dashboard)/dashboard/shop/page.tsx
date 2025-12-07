@@ -19,16 +19,21 @@ import {
   Minus,
 } from 'lucide-react'
 
-// Product images from Unsplash
+// Product images - medical/injectable related from Unsplash
 const productImages = {
-  peptide: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=400&fit=crop',
-  syringe: 'https://images.unsplash.com/photo-1583912086096-8c60d75a53f9?w=400&h=400&fit=crop',
-  supplement: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=400&h=400&fit=crop',
-  vial: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&h=400&fit=crop',
-  scale: 'https://images.unsplash.com/photo-1576671494786-d4e2a74e67e0?w=400&h=400&fit=crop',
-  medical: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400&h=400&fit=crop',
-  pills: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop',
-  bottle: 'https://images.unsplash.com/photo-1616671276441-2f2c277b8bf6?w=400&h=400&fit=crop',
+  // Peptide vials
+  bpc157: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400&h=400&fit=crop', // Medical vial
+  semaglutide: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop', // Medication
+  tb500: 'https://images.unsplash.com/photo-1579165466741-7f35e4755660?w=400&h=400&fit=crop', // Lab vials
+  ghkcu: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=400&fit=crop', // Research peptide
+
+  // Supplies
+  syringes: 'https://images.unsplash.com/photo-1583912086096-8c60d75a53f9?w=400&h=400&fit=crop', // Syringes
+  bacwater: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400&h=400&fit=crop', // Sterile water/vial
+  alcoholpads: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop', // Medical supplies
+
+  // Equipment
+  scale: 'https://images.unsplash.com/photo-1576671494786-d4e2a74e67e0?w=400&h=400&fit=crop', // Body scale
 }
 
 const categories = [
@@ -47,7 +52,7 @@ const featuredProducts = [
     originalPrice: 59.99,
     rating: 4.8,
     reviews: 124,
-    image: productImages.vial,
+    image: productImages.bpc157,
     badge: 'Best Seller',
     inStock: true,
     description: 'Research peptide for tissue repair studies',
@@ -60,7 +65,7 @@ const featuredProducts = [
     originalPrice: null,
     rating: 4.9,
     reviews: 89,
-    image: productImages.peptide,
+    image: productImages.semaglutide,
     badge: 'Popular',
     inStock: true,
     description: 'GLP-1 receptor agonist for research',
@@ -73,7 +78,7 @@ const featuredProducts = [
     originalPrice: null,
     rating: 4.7,
     reviews: 256,
-    image: productImages.syringe,
+    image: productImages.syringes,
     badge: null,
     inStock: true,
     description: '29G 1/2" insulin syringes',
@@ -86,7 +91,7 @@ const featuredProducts = [
     originalPrice: null,
     rating: 4.9,
     reviews: 312,
-    image: productImages.bottle,
+    image: productImages.bacwater,
     badge: 'Essential',
     inStock: true,
     description: 'Sterile water for reconstitution',
@@ -99,7 +104,7 @@ const featuredProducts = [
     originalPrice: 54.99,
     rating: 4.6,
     reviews: 78,
-    image: productImages.medical,
+    image: productImages.tb500,
     badge: 'Sale',
     inStock: true,
     description: 'Thymosin beta-4 fragment',
@@ -112,7 +117,7 @@ const featuredProducts = [
     originalPrice: null,
     rating: 4.7,
     reviews: 65,
-    image: productImages.vial,
+    image: productImages.ghkcu,
     badge: null,
     inStock: true,
     description: 'Copper peptide complex',
@@ -125,7 +130,7 @@ const featuredProducts = [
     originalPrice: null,
     rating: 4.8,
     reviews: 189,
-    image: productImages.medical,
+    image: productImages.alcoholpads,
     badge: null,
     inStock: true,
     description: '70% isopropyl alcohol wipes',
