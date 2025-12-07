@@ -5,7 +5,12 @@
       "Bash(npm uninstall:*)",
       "Bash(npm install:*)",
       "Bash(find:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Initial Phase 1 MVP - Peptide Health Platform\n\nThis commit includes the complete Phase 1 MVP implementation:\n\nWebsite (Next.js 14):\n- Landing page with hero, features, pricing, and CTA sections\n- Authentication system with NextAuth (login/register)\n- Dashboard with protocol overview and quick actions\n- Protocol management UI (list, detail, templates)\n- Injection tracking with site rotation\n- Health tracking (weight, energy, sleep, mood)\n- Product catalog and shop pages\n- Responsive design with dark mode\n\nUI Components:\n- Button, Card, Input, Badge, Avatar, Progress\n- Custom Tailwind theme with brand colors\n- Neumorphic design elements\n\nTech Stack:\n- Next.js 14 with App Router\n- TypeScript\n- Tailwind CSS\n- NextAuth.js for authentication\n- Zustand for state management\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git restore:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
