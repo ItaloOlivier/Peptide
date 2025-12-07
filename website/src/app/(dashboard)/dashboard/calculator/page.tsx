@@ -8,10 +8,10 @@ import {
   Calculator,
   Beaker,
   Droplets,
-  Scale,
   Syringe,
   Info,
   ChevronDown,
+  ChevronRight,
   RotateCcw,
   Copy,
   Check,
@@ -21,10 +21,21 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  HelpCircle,
+  Target,
+  Zap,
+  Heart,
+  Brain,
+  Dumbbell,
+  Flame,
+  Clock,
+  Shield,
+  CheckCircle2,
+  ArrowRight,
+  Lightbulb,
 } from 'lucide-react'
 
-// Peptide dosing data with weight/age/gender considerations
-// Based on clinical research, biohacker protocols, and medical literature
+// Peptide data with beginner-friendly descriptions
 const peptidePresets = [
   {
     id: 'bpc157',
@@ -33,11 +44,14 @@ const peptidePresets = [
     typicalDose: 250,
     doseUnit: 'mcg',
     frequency: 'Once or twice daily',
-    notes: 'Subcutaneous injection, rotate sites',
-    category: 'Healing',
-    // Dosing parameters for recommendations
+    category: 'Healing & Recovery',
+    icon: Heart,
+    color: 'emerald',
+    shortDesc: 'Helps your body heal faster',
+    longDesc: 'A healing peptide that supports tissue repair, gut health, and injury recovery. Popular for joint and muscle healing.',
+    beginnerTip: 'Great first peptide - very well tolerated with minimal side effects.',
     dosing: {
-      basePerKg: 2.5, // mcg/kg base dose
+      basePerKg: 2.5,
       minDose: 200,
       maxDose: 500,
       ageFactors: { young: 1.0, middle: 1.0, senior: 0.85 },
@@ -51,11 +65,15 @@ const peptidePresets = [
     vialSize: 5,
     typicalDose: 2.5,
     doseUnit: 'mg',
-    frequency: 'Twice weekly (loading), once weekly (maintenance)',
-    notes: 'Subcutaneous or intramuscular',
-    category: 'Healing',
+    frequency: 'Twice weekly',
+    category: 'Healing & Recovery',
+    icon: Heart,
+    color: 'emerald',
+    shortDesc: 'Accelerates injury healing',
+    longDesc: 'Promotes healing of muscles, tendons, and ligaments. Often combined with BPC-157 for enhanced recovery.',
+    beginnerTip: 'Usually taken less frequently than other peptides - only 2x per week.',
     dosing: {
-      basePerKg: 0.03, // mg/kg
+      basePerKg: 0.03,
       minDose: 2,
       maxDose: 5,
       ageFactors: { young: 1.0, middle: 1.0, senior: 0.8 },
@@ -70,10 +88,14 @@ const peptidePresets = [
     typicalDose: 0.25,
     doseUnit: 'mg',
     frequency: 'Once weekly',
-    notes: 'Start low, titrate up slowly over 4-week intervals',
-    category: 'Weight Loss',
+    category: 'Weight Management',
+    icon: Flame,
+    color: 'orange',
+    shortDesc: 'Reduces appetite & aids weight loss',
+    longDesc: 'A GLP-1 medication that helps control appetite and blood sugar. The active ingredient in Ozempic and Wegovy.',
+    beginnerTip: 'Start with the lowest dose and increase slowly every 4 weeks to minimize nausea.',
     dosing: {
-      basePerKg: 0.003, // mg/kg starting
+      basePerKg: 0.003,
       minDose: 0.25,
       maxDose: 2.4,
       ageFactors: { young: 1.0, middle: 1.0, senior: 0.75 },
@@ -88,10 +110,14 @@ const peptidePresets = [
     typicalDose: 2.5,
     doseUnit: 'mg',
     frequency: 'Once weekly',
-    notes: 'Dual GIP/GLP-1 agonist. Start at 2.5mg, titrate every 4 weeks',
-    category: 'Weight Loss',
+    category: 'Weight Management',
+    icon: Flame,
+    color: 'orange',
+    shortDesc: 'Powerful appetite control',
+    longDesc: 'A dual-action medication (GIP + GLP-1) for weight management. The active ingredient in Mounjaro and Zepbound.',
+    beginnerTip: 'Even more effective than Semaglutide but requires careful dose titration.',
     dosing: {
-      basePerKg: 0.025, // mg/kg
+      basePerKg: 0.025,
       minDose: 2.5,
       maxDose: 15,
       ageFactors: { young: 1.0, middle: 1.0, senior: 0.7 },
@@ -106,13 +132,17 @@ const peptidePresets = [
     typicalDose: 100,
     doseUnit: 'mg',
     frequency: 'Daily or every other day',
-    notes: 'Subcutaneous, may cause flushing. Build up tolerance gradually',
-    category: 'Longevity',
+    category: 'Energy & Longevity',
+    icon: Zap,
+    color: 'purple',
+    shortDesc: 'Boosts cellular energy & anti-aging',
+    longDesc: 'A coenzyme essential for cellular energy production. Declines with age, so supplementation may support vitality and longevity.',
+    beginnerTip: 'May cause temporary flushing or warmth - this is normal and fades with continued use.',
     dosing: {
-      basePerKg: 1.2, // mg/kg
+      basePerKg: 1.2,
       minDose: 50,
       maxDose: 200,
-      ageFactors: { young: 0.8, middle: 1.0, senior: 1.2 }, // Seniors benefit more
+      ageFactors: { young: 0.8, middle: 1.0, senior: 1.2 },
       genderFactors: { male: 1.0, female: 0.9 },
       goalFactors: { conservative: 0.6, standard: 1.0, aggressive: 1.4 },
     },
@@ -124,28 +154,36 @@ const peptidePresets = [
     typicalDose: 1,
     doseUnit: 'mg',
     frequency: 'Daily',
-    notes: 'Copper peptide for skin/hair. Can also be used topically',
-    category: 'Anti-Aging',
+    category: 'Skin & Hair',
+    icon: Sparkles,
+    color: 'pink',
+    shortDesc: 'Improves skin, hair & healing',
+    longDesc: 'A copper peptide that promotes collagen production, skin elasticity, and hair growth. Also supports wound healing.',
+    beginnerTip: 'Can also be applied topically in serums - injection gives systemic benefits.',
     dosing: {
-      basePerKg: 0.015, // mg/kg
+      basePerKg: 0.015,
       minDose: 0.5,
       maxDose: 2,
       ageFactors: { young: 0.8, middle: 1.0, senior: 1.1 },
-      genderFactors: { male: 1.0, female: 1.1 }, // Women often use for skin
+      genderFactors: { male: 1.0, female: 1.1 },
       goalFactors: { conservative: 0.7, standard: 1.0, aggressive: 1.3 },
     },
   },
   {
     id: 'cjc1295',
-    name: 'CJC-1295 (no DAC)',
+    name: 'CJC-1295',
     vialSize: 2,
     typicalDose: 100,
     doseUnit: 'mcg',
     frequency: '2-3 times daily',
-    notes: 'GHRH analog. Best before bed and post-workout on empty stomach',
-    category: 'Growth Hormone',
+    category: 'Growth & Performance',
+    icon: Dumbbell,
+    color: 'blue',
+    shortDesc: 'Stimulates natural growth hormone',
+    longDesc: 'A growth hormone releasing hormone that stimulates your body to produce more HGH naturally. Supports muscle, sleep, and recovery.',
+    beginnerTip: 'Best taken on an empty stomach, especially before bed for enhanced sleep.',
     dosing: {
-      basePerKg: 1.0, // mcg/kg per dose
+      basePerKg: 1.0,
       minDose: 50,
       maxDose: 150,
       ageFactors: { young: 1.1, middle: 1.0, senior: 0.8 },
@@ -160,10 +198,14 @@ const peptidePresets = [
     typicalDose: 200,
     doseUnit: 'mcg',
     frequency: '2-3 times daily',
-    notes: 'Selective GHRP. Often stacked with CJC-1295 for synergy',
-    category: 'Growth Hormone',
+    category: 'Growth & Performance',
+    icon: Dumbbell,
+    color: 'blue',
+    shortDesc: 'Gentle growth hormone booster',
+    longDesc: 'One of the safest growth hormone peptides. Promotes muscle growth, fat loss, and better sleep without harsh side effects.',
+    beginnerTip: 'Often combined with CJC-1295 for synergistic effects. Very well tolerated.',
     dosing: {
-      basePerKg: 2.5, // mcg/kg per dose
+      basePerKg: 2.5,
       minDose: 100,
       maxDose: 300,
       ageFactors: { young: 1.1, middle: 1.0, senior: 0.75 },
@@ -173,33 +215,41 @@ const peptidePresets = [
   },
   {
     id: 'pt141',
-    name: 'PT-141 (Bremelanotide)',
+    name: 'PT-141',
     vialSize: 10,
     typicalDose: 1.5,
     doseUnit: 'mg',
-    frequency: 'As needed, max 8 doses/month',
-    notes: 'Subcutaneous, 45 min before activity. May cause nausea initially',
-    category: 'Sexual Health',
+    frequency: 'As needed',
+    category: 'Wellness',
+    icon: Heart,
+    color: 'red',
+    shortDesc: 'Supports intimate wellness',
+    longDesc: 'A peptide that works through the nervous system to support sexual function in both men and women.',
+    beginnerTip: 'Use 45 minutes before needed. May cause temporary nausea - start with a lower dose.',
     dosing: {
-      basePerKg: 0.018, // mg/kg
+      basePerKg: 0.018,
       minDose: 0.5,
       maxDose: 2,
       ageFactors: { young: 0.9, middle: 1.0, senior: 0.8 },
-      genderFactors: { male: 1.0, female: 0.7 }, // Lower dose for women
+      genderFactors: { male: 1.0, female: 0.7 },
       goalFactors: { conservative: 0.6, standard: 1.0, aggressive: 1.2 },
     },
   },
   {
-    id: 'mots-c',
+    id: 'motsc',
     name: 'MOTS-c',
     vialSize: 10,
     typicalDose: 5,
     doseUnit: 'mg',
     frequency: '3x weekly',
-    notes: 'Mitochondrial peptide. Enhances metabolism and exercise capacity',
-    category: 'Longevity',
+    category: 'Energy & Longevity',
+    icon: Zap,
+    color: 'purple',
+    shortDesc: 'Enhances metabolism & exercise',
+    longDesc: 'A mitochondrial peptide that improves how your body uses energy. Supports exercise performance and metabolic health.',
+    beginnerTip: 'Great for improving exercise capacity and energy levels.',
     dosing: {
-      basePerKg: 0.06, // mg/kg
+      basePerKg: 0.06,
       minDose: 2.5,
       maxDose: 10,
       ageFactors: { young: 0.9, middle: 1.0, senior: 1.15 },
@@ -213,11 +263,15 @@ const peptidePresets = [
     vialSize: 10,
     typicalDose: 5,
     doseUnit: 'mg',
-    frequency: 'Daily for 10-20 days, 2-3 cycles/year',
-    notes: 'Telomerase activator. Cycle protocol important',
-    category: 'Longevity',
+    frequency: 'Daily (10-20 day cycles)',
+    category: 'Energy & Longevity',
+    icon: Clock,
+    color: 'purple',
+    shortDesc: 'Anti-aging at the cellular level',
+    longDesc: 'A peptide that may support telomere health - the protective caps on your DNA associated with cellular aging.',
+    beginnerTip: 'Used in cycles (10-20 days) rather than continuously. 2-3 cycles per year typical.',
     dosing: {
-      basePerKg: 0.06, // mg/kg
+      basePerKg: 0.06,
       minDose: 3,
       maxDose: 10,
       ageFactors: { young: 0.7, middle: 1.0, senior: 1.2 },
@@ -225,53 +279,49 @@ const peptidePresets = [
       goalFactors: { conservative: 0.7, standard: 1.0, aggressive: 1.2 },
     },
   },
-  {
-    id: 'ss31',
-    name: 'SS-31 (Elamipretide)',
-    vialSize: 20,
-    typicalDose: 20,
-    doseUnit: 'mg',
-    frequency: 'Daily',
-    notes: 'Mitochondrial-targeted peptide. Cardioprotective properties',
-    category: 'Longevity',
-    dosing: {
-      basePerKg: 0.25, // mg/kg
-      minDose: 10,
-      maxDose: 40,
-      ageFactors: { young: 0.8, middle: 1.0, senior: 1.2 },
-      genderFactors: { male: 1.0, female: 0.9 },
-      goalFactors: { conservative: 0.6, standard: 1.0, aggressive: 1.25 },
-    },
-  },
-  {
-    id: 'custom',
-    name: 'Custom Peptide',
-    vialSize: 0,
-    typicalDose: 0,
-    doseUnit: 'mcg',
-    frequency: 'As prescribed',
-    notes: 'Enter your own values',
-    category: 'Custom',
-    dosing: null,
-  },
 ]
 
 type AgeRange = 'young' | 'middle' | 'senior'
 type Gender = 'male' | 'female'
 type Goal = 'conservative' | 'standard' | 'aggressive'
 
-const categoryColors: Record<string, string> = {
-  'Healing': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  'Weight Loss': 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  'Longevity': 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  'Anti-Aging': 'bg-pink-500/10 text-pink-400 border-pink-500/20',
-  'Growth Hormone': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  'Sexual Health': 'bg-red-500/10 text-red-400 border-red-500/20',
-  'Custom': 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
+  'Healing & Recovery': { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
+  'Weight Management': { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/20' },
+  'Energy & Longevity': { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20' },
+  'Skin & Hair': { bg: 'bg-pink-500/10', text: 'text-pink-400', border: 'border-pink-500/20' },
+  'Growth & Performance': { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20' },
+  'Wellness': { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/20' },
+}
+
+// Tooltip component
+function Tooltip({ children, content }: { children: React.ReactNode; content: string }) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="relative inline-flex items-center">
+      <div
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onClick={() => setShow(!show)}
+        className="cursor-help"
+      >
+        {children}
+      </div>
+      {show && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-slate-300 whitespace-normal w-64 z-50 shadow-xl">
+          {content}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-700" />
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function CalculatorPage() {
-  // Reconstitution calculator state
+  // Current step in the wizard
+  const [currentStep, setCurrentStep] = useState(1)
+
+  // Form state
   const [selectedPeptide, setSelectedPeptide] = useState(peptidePresets[0])
   const [peptideAmount, setPeptideAmount] = useState<string>('5')
   const [waterVolume, setWaterVolume] = useState<string>('2')
@@ -280,15 +330,15 @@ export default function CalculatorPage() {
   const [showPresets, setShowPresets] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  // Personalization state for recommended dosing
+  // Profile state
   const [bodyWeight, setBodyWeight] = useState<string>('70')
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg')
   const [age, setAge] = useState<string>('35')
   const [gender, setGender] = useState<Gender>('male')
   const [goal, setGoal] = useState<Goal>('standard')
-  const [showRecommendation, setShowRecommendation] = useState(true)
+  const [experienceLevel, setExperienceLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
 
-  // Calculate recommended dose based on biometrics
+  // Calculate recommended dose
   const recommendedDose = useMemo(() => {
     if (!selectedPeptide.dosing || !bodyWeight || !age) return null
 
@@ -301,38 +351,30 @@ export default function CalculatorPage() {
 
     const dosing = selectedPeptide.dosing
 
-    // Determine age category
     let ageRange: AgeRange
     if (ageNum < 35) ageRange = 'young'
     else if (ageNum < 55) ageRange = 'middle'
     else ageRange = 'senior'
 
-    // Calculate base dose from weight
     let baseDose = dosing.basePerKg * weightKg
-
-    // Apply modifiers
     const ageFactor = dosing.ageFactors[ageRange]
     const genderFactor = dosing.genderFactors[gender]
     const goalFactor = dosing.goalFactors[goal]
 
-    let recommendedDose = baseDose * ageFactor * genderFactor * goalFactor
+    let recDose = baseDose * ageFactor * genderFactor * goalFactor
+    recDose = Math.max(dosing.minDose, Math.min(dosing.maxDose, recDose))
 
-    // Clamp to min/max
-    recommendedDose = Math.max(dosing.minDose, Math.min(dosing.maxDose, recommendedDose))
-
-    // Round appropriately
     if (selectedPeptide.doseUnit === 'mcg') {
-      recommendedDose = Math.round(recommendedDose / 10) * 10 // Round to nearest 10 mcg
+      recDose = Math.round(recDose / 10) * 10
     } else {
-      recommendedDose = Math.round(recommendedDose * 100) / 100 // Round to 2 decimal places
+      recDose = Math.round(recDose * 100) / 100
     }
 
-    // Calculate dose comparison to typical
     const typicalDose = selectedPeptide.typicalDose
-    const percentDiff = ((recommendedDose - typicalDose) / typicalDose) * 100
+    const percentDiff = ((recDose - typicalDose) / typicalDose) * 100
 
     return {
-      dose: recommendedDose,
+      dose: recDose,
       unit: selectedPeptide.doseUnit,
       weightKg,
       ageRange,
@@ -345,15 +387,13 @@ export default function CalculatorPage() {
     }
   }, [selectedPeptide, bodyWeight, weightUnit, age, gender, goal])
 
-  // Calculate concentration and injection volume
+  // Calculate injection volume
   const calculations = useMemo(() => {
     const peptideMg = parseFloat(peptideAmount) || 0
     const waterMl = parseFloat(waterVolume) || 0
     const dose = parseFloat(desiredDose) || 0
 
-    if (peptideMg <= 0 || waterMl <= 0) {
-      return null
-    }
+    if (peptideMg <= 0 || waterMl <= 0 || dose <= 0) return null
 
     const concentrationMgMl = peptideMg / waterMl
     const concentrationMcgMl = concentrationMgMl * 1000
@@ -373,11 +413,9 @@ export default function CalculatorPage() {
 
   const handlePresetSelect = (preset: typeof peptidePresets[0]) => {
     setSelectedPeptide(preset)
-    if (preset.id !== 'custom') {
-      setPeptideAmount(preset.vialSize.toString())
-      setDesiredDose(preset.typicalDose.toString())
-      setDoseUnit(preset.doseUnit as 'mcg' | 'mg')
-    }
+    setPeptideAmount(preset.vialSize.toString())
+    setDesiredDose(preset.typicalDose.toString())
+    setDoseUnit(preset.doseUnit as 'mcg' | 'mg')
     setShowPresets(false)
   }
 
@@ -389,6 +427,7 @@ export default function CalculatorPage() {
   }
 
   const handleReset = () => {
+    setCurrentStep(1)
     setSelectedPeptide(peptidePresets[0])
     setPeptideAmount('5')
     setWaterVolume('2')
@@ -398,615 +437,615 @@ export default function CalculatorPage() {
     setAge('35')
     setGender('male')
     setGoal('standard')
+    setExperienceLevel('beginner')
   }
 
   const handleCopyResults = () => {
     if (!calculations) return
 
-    let text = `Dosage Calculation for ${selectedPeptide.name}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Peptide: ${peptideAmount}mg in ${waterVolume}ml BAC water
-Concentration: ${calculations.concentrationMgMl.toFixed(2)}mg/ml
-Desired Dose: ${desiredDose}${doseUnit}
-Injection Volume: ${calculations.injectionVolumeMl.toFixed(3)}ml (${calculations.injectionUnits.toFixed(1)} units)
-Doses per Vial: ~${Math.floor(calculations.dosesPerVial)} doses`
+    const text = `My ${selectedPeptide.name} Dosage
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Dose: ${desiredDose} ${doseUnit}
+Draw: ${calculations.injectionUnits.toFixed(1)} units on insulin syringe
+Frequency: ${selectedPeptide.frequency}
+Doses per vial: ~${Math.floor(calculations.dosesPerVial)}
 
-    if (recommendedDose) {
-      text += `
-
-Personalized Recommendation:
-Weight: ${bodyWeight}${weightUnit} | Age: ${age} | Gender: ${gender}
-Goal: ${goal}
-Recommended Dose: ${recommendedDose.dose}${recommendedDose.unit}`
-    }
+Reconstitution:
+${peptideAmount}mg peptide + ${waterVolume}ml water`
 
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const steps = [
+    { num: 1, title: 'About You', desc: 'Tell us about yourself' },
+    { num: 2, title: 'Choose Goal', desc: 'What do you want to achieve?' },
+    { num: 3, title: 'Prepare Vial', desc: 'Mix your peptide' },
+    { num: 4, title: 'Your Dose', desc: 'How much to inject' },
+  ]
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Dosage Calculator</h1>
-        <p className="text-slate-400">
-          Calculate reconstitution ratios, injection volumes, and get personalized dose recommendations
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-white">Peptide Dosage Calculator</h1>
+        <p className="text-slate-400 mt-1">
+          We'll guide you step-by-step to calculate your perfect dose
         </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Left Column - Inputs */}
-        <div className="space-y-6">
-          {/* Peptide Selection */}
-          <Card className="bg-slate-800/50 border-slate-700/50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Beaker className="w-5 h-5 text-primary-400" />
-                  Select Peptide
-                </h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleReset}
-                  className="text-slate-400 hover:text-white"
-                >
-                  <RotateCcw className="w-4 h-4 mr-1" />
-                  Reset
-                </Button>
+      {/* Progress Steps */}
+      <div className="flex items-center justify-center gap-2 mb-8">
+        {steps.map((step, index) => (
+          <div key={step.num} className="flex items-center">
+            <button
+              onClick={() => setCurrentStep(step.num)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                currentStep === step.num
+                  ? 'bg-primary-500 text-white'
+                  : currentStep > step.num
+                  ? 'bg-emerald-500/20 text-emerald-400'
+                  : 'bg-slate-800 text-slate-500'
+              }`}
+            >
+              {currentStep > step.num ? (
+                <CheckCircle2 className="w-5 h-5" />
+              ) : (
+                <span className="w-5 h-5 flex items-center justify-center text-sm font-bold">{step.num}</span>
+              )}
+              <span className="hidden sm:inline text-sm font-medium">{step.title}</span>
+            </button>
+            {index < steps.length - 1 && (
+              <ChevronRight className="w-5 h-5 text-slate-600 mx-1" />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Step 1: About You */}
+      {currentStep === 1 && (
+        <Card className="bg-slate-800/50 border-slate-700/50">
+          <CardContent className="p-6 sm:p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-8 h-8 text-primary-400" />
               </div>
+              <h2 className="text-xl font-semibold text-white">Let's personalize your experience</h2>
+              <p className="text-slate-400 mt-1">This helps us calculate the right dose for your body</p>
+            </div>
 
-              {/* Preset Dropdown */}
-              <div className="relative mb-4">
-                <button
-                  onClick={() => setShowPresets(!showPresets)}
-                  className="w-full flex items-center justify-between p-3 bg-slate-900 border border-slate-700 rounded-lg text-white hover:border-primary-500/50 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <span>{selectedPeptide.name}</span>
-                    <Badge className={categoryColors[selectedPeptide.category]}>
-                      {selectedPeptide.category}
-                    </Badge>
-                  </div>
-                  <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${showPresets ? 'rotate-180' : ''}`} />
-                </button>
-
-                {showPresets && (
-                  <div className="absolute z-10 w-full mt-2 bg-slate-900 border border-slate-700 rounded-lg shadow-xl max-h-80 overflow-y-auto">
-                    {peptidePresets.map((preset) => (
-                      <button
-                        key={preset.id}
-                        onClick={() => handlePresetSelect(preset)}
-                        className={`w-full text-left p-3 hover:bg-slate-800 transition-colors ${
-                          selectedPeptide.id === preset.id ? 'bg-primary-500/10 text-primary-400' : 'text-white'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{preset.name}</span>
-                          <Badge className={`${categoryColors[preset.category]} text-xs`}>
-                            {preset.category}
-                          </Badge>
-                        </div>
-                        {preset.id !== 'custom' && (
-                          <div className="text-xs text-slate-400 mt-0.5">
-                            {preset.vialSize}mg vial • {preset.typicalDose}{preset.doseUnit} typical
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Peptide Info */}
-              {selectedPeptide.id !== 'custom' && (
-                <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
-                  <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 text-primary-400 mt-0.5 shrink-0" />
-                    <div className="text-sm">
-                      <p className="text-slate-300"><strong>Frequency:</strong> {selectedPeptide.frequency}</p>
-                      <p className="text-slate-400 mt-1">{selectedPeptide.notes}</p>
-                    </div>
+            <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              {/* Weight */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
+                  Body Weight
+                  <Tooltip content="Your dose will be calculated based on your weight. Heavier people generally need slightly higher doses.">
+                    <HelpCircle className="w-4 h-4 text-slate-500" />
+                  </Tooltip>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    value={bodyWeight}
+                    onChange={(e) => setBodyWeight(e.target.value)}
+                    className="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="70"
+                  />
+                  <div className="flex rounded-lg border border-slate-700 overflow-hidden">
+                    <button
+                      onClick={() => setWeightUnit('kg')}
+                      className={`px-4 py-2 transition-colors ${
+                        weightUnit === 'kg' ? 'bg-primary-500 text-white' : 'bg-slate-900 text-slate-400'
+                      }`}
+                    >
+                      kg
+                    </button>
+                    <button
+                      onClick={() => setWeightUnit('lbs')}
+                      className={`px-4 py-2 transition-colors ${
+                        weightUnit === 'lbs' ? 'bg-primary-500 text-white' : 'bg-slate-900 text-slate-400'
+                      }`}
+                    >
+                      lbs
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
+
+              {/* Age */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
+                  Age
+                  <Tooltip content="Age affects how your body processes peptides. We'll adjust the dose accordingly.">
+                    <HelpCircle className="w-4 h-4 text-slate-500" />
+                  </Tooltip>
+                </label>
+                <input
+                  type="number"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="35"
+                />
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
+                  Biological Sex
+                  <Tooltip content="Hormonal differences affect how peptides are metabolized. This helps us fine-tune your dose.">
+                    <HelpCircle className="w-4 h-4 text-slate-500" />
+                  </Tooltip>
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setGender('male')}
+                    className={`p-3 rounded-lg border transition-all ${
+                      gender === 'male'
+                        ? 'bg-blue-500/20 border-blue-500/50 text-blue-400'
+                        : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    Male
+                  </button>
+                  <button
+                    onClick={() => setGender('female')}
+                    className={`p-3 rounded-lg border transition-all ${
+                      gender === 'female'
+                        ? 'bg-pink-500/20 border-pink-500/50 text-pink-400'
+                        : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    Female
+                  </button>
+                </div>
+              </div>
+
+              {/* Experience */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
+                  Experience with Peptides
+                  <Tooltip content="If you're new to peptides, we'll recommend a lower starting dose to see how your body responds.">
+                    <HelpCircle className="w-4 h-4 text-slate-500" />
+                  </Tooltip>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['beginner', 'intermediate', 'advanced'] as const).map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => {
+                        setExperienceLevel(level)
+                        setGoal(level === 'beginner' ? 'conservative' : level === 'intermediate' ? 'standard' : 'aggressive')
+                      }}
+                      className={`p-3 rounded-lg border transition-all text-sm capitalize ${
+                        experienceLevel === level
+                          ? 'bg-primary-500/20 border-primary-500/50 text-primary-400'
+                          : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
+                      }`}
+                    >
+                      {level === 'beginner' ? 'New to this' : level === 'intermediate' ? 'Some exp.' : 'Experienced'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center mt-8">
+              <Button onClick={() => setCurrentStep(2)} className="px-8">
+                Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Step 2: Choose Goal / Peptide */}
+      {currentStep === 2 && (
+        <div className="space-y-6">
+          <Card className="bg-slate-800/50 border-slate-700/50">
+            <CardContent className="p-6 sm:p-8">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-secondary-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Target className="w-8 h-8 text-secondary-400" />
+                </div>
+                <h2 className="text-xl font-semibold text-white">What's your goal?</h2>
+                <p className="text-slate-400 mt-1">Select a peptide based on what you want to achieve</p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {peptidePresets.map((peptide) => {
+                  const colors = categoryColors[peptide.category]
+                  const IconComponent = peptide.icon
+                  return (
+                    <button
+                      key={peptide.id}
+                      onClick={() => handlePresetSelect(peptide)}
+                      className={`p-4 rounded-xl border text-left transition-all ${
+                        selectedPeptide.id === peptide.id
+                          ? `${colors.bg} ${colors.border} ring-2 ring-offset-2 ring-offset-slate-900 ring-${peptide.color}-500`
+                          : 'bg-slate-900 border-slate-700 hover:border-slate-600'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center shrink-0`}>
+                          <IconComponent className={`w-5 h-5 ${colors.text}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-white">{peptide.name}</h3>
+                            {selectedPeptide.id === peptide.id && (
+                              <CheckCircle2 className="w-4 h-4 text-primary-400" />
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-400 mb-2">{peptide.shortDesc}</p>
+                          <Badge className={`${colors.bg} ${colors.text} ${colors.border} text-xs`}>
+                            {peptide.category}
+                          </Badge>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
             </CardContent>
           </Card>
 
-          {/* Reconstitution */}
-          <Card className="bg-slate-800/50 border-slate-700/50">
+          {/* Selected Peptide Info */}
+          <Card className={`${categoryColors[selectedPeptide.category].bg} ${categoryColors[selectedPeptide.category].border}`}>
             <CardContent className="p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                <Droplets className="w-5 h-5 text-secondary-400" />
-                Reconstitution
-              </h2>
+              <div className="flex items-start gap-4">
+                <div className={`w-12 h-12 rounded-xl ${categoryColors[selectedPeptide.category].bg} flex items-center justify-center shrink-0`}>
+                  <selectedPeptide.icon className={`w-6 h-6 ${categoryColors[selectedPeptide.category].text}`} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-white mb-1">{selectedPeptide.name}</h3>
+                  <p className="text-slate-300 mb-3">{selectedPeptide.longDesc}</p>
+                  <div className="flex items-start gap-2 p-3 bg-slate-900/50 rounded-lg">
+                    <Lightbulb className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-amber-300">Beginner Tip</p>
+                      <p className="text-sm text-slate-400">{selectedPeptide.beginnerTip}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-4">
+          <div className="flex justify-between">
+            <Button variant="outline" onClick={() => setCurrentStep(1)}>
+              Back
+            </Button>
+            <Button onClick={() => setCurrentStep(3)}>
+              Continue
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Prepare Vial (Reconstitution) */}
+      {currentStep === 3 && (
+        <div className="space-y-6">
+          <Card className="bg-slate-800/50 border-slate-700/50">
+            <CardContent className="p-6 sm:p-8">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Droplets className="w-8 h-8 text-cyan-400" />
+                </div>
+                <h2 className="text-xl font-semibold text-white">Prepare Your Peptide</h2>
+                <p className="text-slate-400 mt-1">
+                  Peptides come as a powder. You need to mix them with sterile water before use.
+                </p>
+              </div>
+
+              <div className="max-w-xl mx-auto space-y-6">
+                {/* What's in your vial */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Peptide Amount (mg in vial)
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-3">
+                    <span className="w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs">1</span>
+                    How much peptide is in your vial?
+                    <Tooltip content="Check the label on your vial. It will say something like '5mg' or '10mg'. This is the total amount of powder in the vial.">
+                      <HelpCircle className="w-4 h-4 text-slate-500" />
+                    </Tooltip>
                   </label>
-                  <input
-                    type="number"
-                    value={peptideAmount}
-                    onChange={(e) => setPeptideAmount(e.target.value)}
-                    className="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="e.g., 5"
-                    min="0"
-                    step="0.1"
-                  />
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={peptideAmount}
+                      onChange={(e) => setPeptideAmount(e.target.value)}
+                      className="w-full p-4 pr-16 bg-slate-900 border border-slate-700 rounded-lg text-white text-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="5"
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">mg</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                    Common sizes: 5mg, 10mg, or as shown on your {selectedPeptide.name} vial ({selectedPeptide.vialSize}mg typical)
+                  </p>
                 </div>
 
+                {/* Water to add */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Bacteriostatic Water (ml)
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-3">
+                    <span className="w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs">2</span>
+                    How much water will you add?
+                    <Tooltip content="Use bacteriostatic water (BAC water) to mix your peptide. More water = easier to measure small doses. 2ml is a good standard.">
+                      <HelpCircle className="w-4 h-4 text-slate-500" />
+                    </Tooltip>
                   </label>
-                  <div className="flex gap-2">
+
+                  <div className="grid grid-cols-4 gap-3 mb-3">
                     {[1, 2, 3, 5].map((vol) => (
                       <button
                         key={vol}
                         onClick={() => setWaterVolume(vol.toString())}
-                        className={`flex-1 py-2 px-3 rounded-lg border transition-colors ${
+                        className={`p-4 rounded-lg border transition-all ${
                           waterVolume === vol.toString()
-                            ? 'bg-primary-500/10 border-primary-500/50 text-primary-400'
-                            : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-primary-500/30'
+                            ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-400'
+                            : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
                         }`}
                       >
-                        {vol}ml
+                        <div className="text-2xl font-bold">{vol}</div>
+                        <div className="text-xs">ml</div>
                       </button>
                     ))}
                   </div>
-                  <input
-                    type="number"
-                    value={waterVolume}
-                    onChange={(e) => setWaterVolume(e.target.value)}
-                    className="w-full mt-2 p-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="Or enter custom amount"
-                    min="0"
-                    step="0.1"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Dosage */}
-          <Card className="bg-slate-800/50 border-slate-700/50">
-            <CardContent className="p-6">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                <Syringe className="w-5 h-5 text-accent-400" />
-                Desired Dose
-              </h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Dose Amount
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      value={desiredDose}
-                      onChange={(e) => setDesiredDose(e.target.value)}
-                      className="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="e.g., 250"
-                      min="0"
-                      step="0.01"
-                    />
-                    <div className="flex rounded-lg border border-slate-700 overflow-hidden">
-                      <button
-                        onClick={() => setDoseUnit('mcg')}
-                        className={`px-4 py-2 transition-colors ${
-                          doseUnit === 'mcg'
-                            ? 'bg-primary-500 text-white'
-                            : 'bg-slate-900 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        mcg
-                      </button>
-                      <button
-                        onClick={() => setDoseUnit('mg')}
-                        className={`px-4 py-2 transition-colors ${
-                          doseUnit === 'mg'
-                            ? 'bg-primary-500 text-white'
-                            : 'bg-slate-900 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        mg
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Middle Column - Personalization */}
-        <div className="space-y-6">
-          {/* Biometrics for Recommended Dosing */}
-          <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <User className="w-5 h-5 text-purple-400" />
-                  Your Profile
-                </h2>
-                <button
-                  onClick={() => setShowRecommendation(!showRecommendation)}
-                  className="text-xs text-slate-400 hover:text-white"
-                >
-                  {showRecommendation ? 'Hide' : 'Show'} recommendation
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {/* Weight */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Body Weight
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      value={bodyWeight}
-                      onChange={(e) => setBodyWeight(e.target.value)}
-                      className="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="70"
-                      min="0"
-                    />
-                    <div className="flex rounded-lg border border-slate-700 overflow-hidden">
-                      <button
-                        onClick={() => setWeightUnit('kg')}
-                        className={`px-3 py-2 transition-colors ${
-                          weightUnit === 'kg'
-                            ? 'bg-purple-500 text-white'
-                            : 'bg-slate-900 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        kg
-                      </button>
-                      <button
-                        onClick={() => setWeightUnit('lbs')}
-                        className={`px-3 py-2 transition-colors ${
-                          weightUnit === 'lbs'
-                            ? 'bg-purple-500 text-white'
-                            : 'bg-slate-900 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        lbs
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Age */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Age
-                  </label>
-                  <input
-                    type="number"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    className="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="35"
-                    min="18"
-                    max="100"
-                  />
-                  {age && (
-                    <p className="text-xs text-slate-500 mt-1">
-                      Category: {parseInt(age) < 35 ? 'Young Adult' : parseInt(age) < 55 ? 'Middle Aged' : 'Senior'}
+                  <div className="flex items-center gap-2 p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
+                    <Shield className="w-5 h-5 text-emerald-400" />
+                    <p className="text-sm text-slate-400">
+                      <span className="text-emerald-400 font-medium">Recommended: 2ml</span> - Easy to measure and keeps your peptide stable
                     </p>
-                  )}
-                </div>
-
-                {/* Gender */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Biological Sex
-                  </label>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setGender('male')}
-                      className={`flex-1 py-2 px-3 rounded-lg border transition-colors ${
-                        gender === 'male'
-                          ? 'bg-blue-500/20 border-blue-500/50 text-blue-400'
-                          : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-blue-500/30'
-                      }`}
-                    >
-                      Male
-                    </button>
-                    <button
-                      onClick={() => setGender('female')}
-                      className={`flex-1 py-2 px-3 rounded-lg border transition-colors ${
-                        gender === 'female'
-                          ? 'bg-pink-500/20 border-pink-500/50 text-pink-400'
-                          : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-pink-500/30'
-                      }`}
-                    >
-                      Female
-                    </button>
                   </div>
                 </div>
 
-                {/* Goal */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Dosing Approach
-                  </label>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setGoal('conservative')}
-                      className={`flex-1 py-2 px-2 rounded-lg border transition-colors text-sm ${
-                        goal === 'conservative'
-                          ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-                          : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-emerald-500/30'
-                      }`}
-                    >
-                      Conservative
-                    </button>
-                    <button
-                      onClick={() => setGoal('standard')}
-                      className={`flex-1 py-2 px-2 rounded-lg border transition-colors text-sm ${
-                        goal === 'standard'
-                          ? 'bg-primary-500/20 border-primary-500/50 text-primary-400'
-                          : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-primary-500/30'
-                      }`}
-                    >
-                      Standard
-                    </button>
-                    <button
-                      onClick={() => setGoal('aggressive')}
-                      className={`flex-1 py-2 px-2 rounded-lg border transition-colors text-sm ${
-                        goal === 'aggressive'
-                          ? 'bg-orange-500/20 border-orange-500/50 text-orange-400'
-                          : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-orange-500/30'
-                      }`}
-                    >
-                      Aggressive
-                    </button>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-2">
-                    {goal === 'conservative' && 'Lower doses, ideal for beginners or sensitive individuals'}
-                    {goal === 'standard' && 'Typical research-backed doses for most users'}
-                    {goal === 'aggressive' && 'Higher doses for experienced users with specific goals'}
-                  </p>
+                {/* Visual Guide */}
+                <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl border border-cyan-500/20">
+                  <h3 className="font-medium text-white mb-3 flex items-center gap-2">
+                    <Beaker className="w-5 h-5 text-cyan-400" />
+                    Quick Mixing Guide
+                  </h3>
+                  <ol className="space-y-2 text-sm text-slate-300">
+                    <li className="flex items-start gap-2">
+                      <span className="w-5 h-5 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-xs shrink-0">1</span>
+                      Draw {waterVolume}ml of bacteriostatic water into your syringe
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-5 h-5 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-xs shrink-0">2</span>
+                      Inject the water slowly into the peptide vial (aim at the side, not directly on powder)
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-5 h-5 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-xs shrink-0">3</span>
+                      Gently swirl (don't shake!) until the powder is fully dissolved
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-5 h-5 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-xs shrink-0">4</span>
+                      Store in the refrigerator - good for about 4 weeks
+                    </li>
+                  </ol>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Recommended Dose */}
-          {showRecommendation && recommendedDose && selectedPeptide.id !== 'custom' && (
-            <Card className="bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border-emerald-500/20">
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                  <Sparkles className="w-5 h-5 text-emerald-400" />
-                  Recommended Dose
-                </h2>
+          <div className="flex justify-between">
+            <Button variant="outline" onClick={() => setCurrentStep(2)}>
+              Back
+            </Button>
+            <Button onClick={() => setCurrentStep(4)}>
+              Calculate My Dose
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+      )}
 
-                <div className="text-center mb-4">
-                  <p className="text-4xl font-bold text-white">
+      {/* Step 4: Results */}
+      {currentStep === 4 && (
+        <div className="space-y-6">
+          {/* Recommended Dose Card */}
+          {recommendedDose && (
+            <Card className="bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border-emerald-500/30">
+              <CardContent className="p-6 sm:p-8">
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 rounded-full text-emerald-400 text-sm mb-4">
+                    <Sparkles className="w-4 h-4" />
+                    Personalized for you
+                  </div>
+
+                  <h2 className="text-lg text-slate-300 mb-2">Your recommended {selectedPeptide.name} dose:</h2>
+
+                  <div className="text-5xl sm:text-6xl font-bold text-white mb-2">
                     {recommendedDose.dose}
-                    <span className="text-xl text-slate-400 ml-1">{recommendedDose.unit}</span>
-                  </p>
-                  <div className="flex items-center justify-center gap-2 mt-2">
-                    {recommendedDose.percentDiff > 5 ? (
-                      <TrendingUp className="w-4 h-4 text-orange-400" />
-                    ) : recommendedDose.percentDiff < -5 ? (
-                      <TrendingDown className="w-4 h-4 text-emerald-400" />
-                    ) : (
-                      <Minus className="w-4 h-4 text-slate-400" />
-                    )}
-                    <span className={`text-sm ${
-                      Math.abs(recommendedDose.percentDiff) <= 5 ? 'text-slate-400' :
-                      recommendedDose.percentDiff > 0 ? 'text-orange-400' : 'text-emerald-400'
-                    }`}>
-                      {recommendedDose.percentDiff > 0 ? '+' : ''}{recommendedDose.percentDiff.toFixed(0)}% vs typical
-                    </span>
+                    <span className="text-2xl sm:text-3xl text-slate-400 ml-2">{recommendedDose.unit}</span>
                   </div>
+
+                  <p className="text-slate-400 mb-6">{selectedPeptide.frequency}</p>
+
+                  <Button
+                    onClick={handleApplyRecommendation}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Use This Dose
+                  </Button>
                 </div>
 
-                {/* Factors breakdown */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Base (weight-adjusted)</span>
-                    <span className="text-slate-300">{(recommendedDose.dose / (recommendedDose.ageFactor * recommendedDose.genderFactor * recommendedDose.goalFactor)).toFixed(1)} {recommendedDose.unit}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Age factor ({recommendedDose.ageRange})</span>
-                    <span className={recommendedDose.ageFactor !== 1 ? (recommendedDose.ageFactor > 1 ? 'text-orange-400' : 'text-emerald-400') : 'text-slate-300'}>
-                      ×{recommendedDose.ageFactor.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Gender factor ({gender})</span>
-                    <span className={recommendedDose.genderFactor !== 1 ? (recommendedDose.genderFactor > 1 ? 'text-orange-400' : 'text-emerald-400') : 'text-slate-300'}>
-                      ×{recommendedDose.genderFactor.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Goal factor ({goal})</span>
-                    <span className={recommendedDose.goalFactor !== 1 ? (recommendedDose.goalFactor > 1 ? 'text-orange-400' : 'text-emerald-400') : 'text-slate-300'}>
-                      ×{recommendedDose.goalFactor.toFixed(2)}
-                    </span>
+                {/* Why this dose */}
+                <div className="mt-6 pt-6 border-t border-slate-700/50">
+                  <p className="text-sm text-slate-400 text-center mb-3">Why this dose?</p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <Badge className="bg-slate-800/50 text-slate-300 border-slate-700">
+                      {bodyWeight}{weightUnit} body weight
+                    </Badge>
+                    <Badge className="bg-slate-800/50 text-slate-300 border-slate-700">
+                      Age {age}
+                    </Badge>
+                    <Badge className="bg-slate-800/50 text-slate-300 border-slate-700">
+                      {gender === 'male' ? 'Male' : 'Female'}
+                    </Badge>
+                    <Badge className="bg-slate-800/50 text-slate-300 border-slate-700">
+                      {experienceLevel === 'beginner' ? 'Beginner (conservative)' : experienceLevel === 'intermediate' ? 'Intermediate' : 'Experienced (aggressive)'}
+                    </Badge>
                   </div>
                 </div>
-
-                {/* Dose range */}
-                <div className="mb-4">
-                  <div className="flex justify-between text-xs text-slate-500 mb-1">
-                    <span>Min: {recommendedDose.min}{recommendedDose.unit}</span>
-                    <span>Max: {recommendedDose.max}{recommendedDose.unit}</span>
-                  </div>
-                  <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full"
-                      style={{
-                        width: `${((recommendedDose.dose - recommendedDose.min) / (recommendedDose.max - recommendedDose.min)) * 100}%`
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleApplyRecommendation}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                >
-                  Apply Recommended Dose
-                </Button>
               </CardContent>
             </Card>
           )}
 
-          {/* Factor explanations */}
+          {/* Manual Dose Adjustment */}
           <Card className="bg-slate-800/50 border-slate-700/50">
-            <CardContent className="p-4">
-              <h3 className="text-sm font-medium text-slate-300 mb-3">How Recommendations Work</h3>
-              <div className="space-y-2 text-xs text-slate-400">
-                <p><strong className="text-slate-300">Weight:</strong> Base dose scales with lean body mass. Heavier individuals generally need higher doses for equivalent effects.</p>
-                <p><strong className="text-slate-300">Age:</strong> Metabolism and hormone levels change with age. Seniors may need lower doses of stimulatory peptides but higher doses of restorative ones like NAD+.</p>
-                <p><strong className="text-slate-300">Gender:</strong> Hormonal differences affect peptide metabolism. Women typically need 10-15% lower doses for most peptides.</p>
-                <p><strong className="text-slate-300">Goal:</strong> Conservative for beginners/sensitive individuals, aggressive for experienced users targeting specific outcomes.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Column - Results */}
-        <div className="space-y-6">
-          {/* Main Results */}
-          <Card className="bg-gradient-to-br from-primary-500/10 to-secondary-500/10 border-primary-500/20">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                  <Calculator className="w-5 h-5 text-primary-400" />
-                  Calculation Results
-                </h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopyResults}
-                  disabled={!calculations}
-                  className="text-slate-400 hover:text-white"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 mr-1 text-green-400" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 mr-1" />
-                      Copy
-                    </>
-                  )}
-                </Button>
+              <h3 className="font-medium text-white mb-4 flex items-center gap-2">
+                <Syringe className="w-5 h-5 text-accent-400" />
+                Adjust Dose (Optional)
+              </h3>
+              <div className="flex gap-3">
+                <input
+                  type="number"
+                  value={desiredDose}
+                  onChange={(e) => setDesiredDose(e.target.value)}
+                  className="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+                <div className="flex rounded-lg border border-slate-700 overflow-hidden">
+                  <button
+                    onClick={() => setDoseUnit('mcg')}
+                    className={`px-4 py-2 transition-colors ${
+                      doseUnit === 'mcg' ? 'bg-primary-500 text-white' : 'bg-slate-900 text-slate-400'
+                    }`}
+                  >
+                    mcg
+                  </button>
+                  <button
+                    onClick={() => setDoseUnit('mg')}
+                    className={`px-4 py-2 transition-colors ${
+                      doseUnit === 'mg' ? 'bg-primary-500 text-white' : 'bg-slate-900 text-slate-400'
+                    }`}
+                  >
+                    mg
+                  </button>
+                </div>
               </div>
-
-              {calculations ? (
-                <div className="space-y-4">
-                  {/* Concentration */}
-                  <div className="p-4 bg-slate-900/50 rounded-xl">
-                    <p className="text-sm text-slate-400 mb-1">Concentration</p>
-                    <p className="text-2xl font-bold text-white">
-                      {calculations.concentrationMgMl.toFixed(2)} <span className="text-lg text-slate-400">mg/ml</span>
-                    </p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      = {calculations.concentrationMcgMl.toFixed(0)} mcg/ml
-                    </p>
-                  </div>
-
-                  {/* Injection Volume */}
-                  <div className="p-4 bg-gradient-to-r from-accent-500/20 to-accent-500/5 rounded-xl border border-accent-500/30">
-                    <p className="text-sm text-accent-300 mb-1">Injection Volume</p>
-                    <div className="flex items-baseline gap-3">
-                      <p className="text-4xl font-bold text-white">
-                        {calculations.injectionUnits.toFixed(1)}
-                      </p>
-                      <p className="text-xl text-slate-300">units</p>
-                    </div>
-                    <p className="text-sm text-slate-400 mt-2">
-                      = {calculations.injectionVolumeMl.toFixed(3)} ml
-                    </p>
-                    <Badge className="mt-2 bg-accent-500/20 text-accent-300 border-accent-500/30">
-                      {desiredDose} {doseUnit} per injection
-                    </Badge>
-                  </div>
-
-                  {/* Vial Info */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-900/50 rounded-xl">
-                      <p className="text-sm text-slate-400 mb-1">Doses/Vial</p>
-                      <p className="text-2xl font-bold text-white">
-                        ~{Math.floor(calculations.dosesPerVial)}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-slate-900/50 rounded-xl">
-                      <p className="text-sm text-slate-400 mb-1">Total Volume</p>
-                      <p className="text-2xl font-bold text-white">
-                        {waterVolume} <span className="text-lg text-slate-400">ml</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Calculator className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-400">Enter peptide and water amounts to calculate</p>
-                </div>
-              )}
             </CardContent>
           </Card>
 
-          {/* Syringe Guide */}
-          {calculations && calculations.injectionUnits <= 100 && (
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Insulin Syringe Guide</h3>
-                <div className="relative h-8 bg-slate-900 rounded-full overflow-hidden">
-                  <div
-                    className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary-500 to-primary-400 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.min(calculations.injectionUnits, 100)}%` }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-between px-3">
-                    {[0, 25, 50, 75, 100].map((mark) => (
-                      <div key={mark} className="flex flex-col items-center">
-                        <div className="w-px h-3 bg-slate-600" />
-                        <span className="text-xs text-slate-500 mt-1">{mark}</span>
-                      </div>
-                    ))}
+          {/* Final Result - How much to inject */}
+          {calculations && (
+            <Card className="bg-gradient-to-br from-accent-500/20 to-primary-500/20 border-accent-500/30">
+              <CardContent className="p-6 sm:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <Calculator className="w-5 h-5 text-accent-400" />
+                    How Much to Inject
+                  </h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyResults}
+                    className="text-slate-400 hover:text-white"
+                  >
+                    {copied ? <Check className="w-4 h-4 mr-1 text-emerald-400" /> : <Copy className="w-4 h-4 mr-1" />}
+                    {copied ? 'Copied!' : 'Copy'}
+                  </Button>
+                </div>
+
+                {/* Big number */}
+                <div className="text-center mb-6">
+                  <p className="text-slate-400 mb-2">Draw this much on your insulin syringe:</p>
+                  <div className="text-6xl sm:text-7xl font-bold text-white">
+                    {calculations.injectionUnits.toFixed(1)}
+                  </div>
+                  <p className="text-2xl text-slate-400">units</p>
+                </div>
+
+                {/* Visual syringe */}
+                <div className="mb-6">
+                  <div className="relative h-12 bg-slate-900 rounded-full overflow-hidden border-2 border-slate-700">
+                    <div
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-accent-500 to-accent-400 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(calculations.injectionUnits, 100)}%` }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-between px-4">
+                      {[0, 25, 50, 75, 100].map((mark) => (
+                        <div key={mark} className="flex flex-col items-center">
+                          <div className="w-0.5 h-4 bg-slate-600" />
+                          <span className="text-xs text-slate-500 mt-1">{mark}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Marker for injection point */}
+                    <div
+                      className="absolute top-0 bottom-0 w-1 bg-white shadow-lg"
+                      style={{ left: `${Math.min(calculations.injectionUnits, 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-center text-sm text-slate-400 mt-3">
+                    Fill your syringe to the <span className="text-accent-400 font-semibold">{calculations.injectionUnits.toFixed(1)}</span> mark
+                  </p>
+                </div>
+
+                {/* Additional info */}
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="p-4 bg-slate-900/50 rounded-xl text-center">
+                    <p className="text-sm text-slate-400 mb-1">In milliliters</p>
+                    <p className="text-xl font-semibold text-white">{calculations.injectionVolumeMl.toFixed(3)} ml</p>
+                  </div>
+                  <div className="p-4 bg-slate-900/50 rounded-xl text-center">
+                    <p className="text-sm text-slate-400 mb-1">Doses in vial</p>
+                    <p className="text-xl font-semibold text-white">~{Math.floor(calculations.dosesPerVial)}</p>
+                  </div>
+                  <div className="p-4 bg-slate-900/50 rounded-xl text-center">
+                    <p className="text-sm text-slate-400 mb-1">Concentration</p>
+                    <p className="text-xl font-semibold text-white">{calculations.concentrationMgMl.toFixed(1)} mg/ml</p>
                   </div>
                 </div>
-                <p className="text-center text-sm text-slate-400 mt-3">
-                  Draw to <span className="text-primary-400 font-semibold">{calculations.injectionUnits.toFixed(1)} units</span>
-                </p>
               </CardContent>
             </Card>
           )}
 
           {/* Safety Notice */}
           <Card className="bg-amber-500/10 border-amber-500/20">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                <div className="text-sm">
-                  <p className="font-medium text-amber-300 mb-1">Medical Disclaimer</p>
-                  <ul className="text-amber-200/80 space-y-1 text-xs">
-                    <li>• Recommendations are for educational purposes only</li>
-                    <li>• Always consult a healthcare provider before use</li>
-                    <li>• Individual responses vary significantly</li>
-                    <li>• Start with lower doses and titrate up</li>
-                    <li>• Monitor for side effects and adjust accordingly</li>
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <AlertTriangle className="w-6 h-6 text-amber-400 shrink-0" />
+                <div>
+                  <h3 className="font-medium text-amber-300 mb-2">Important Reminders</h3>
+                  <ul className="space-y-2 text-sm text-amber-200/80">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      Always consult a healthcare provider before starting any peptide
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      Use a fresh needle for each injection and rotate injection sites
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      Store reconstituted peptides in the refrigerator (2-8°C)
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      Start with lower doses and increase gradually based on response
+                    </li>
                   </ul>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+          <div className="flex justify-between">
+            <Button variant="outline" onClick={() => setCurrentStep(3)}>
+              Back
+            </Button>
+            <Button variant="outline" onClick={handleReset}>
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Start Over
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
