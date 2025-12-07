@@ -28,11 +28,13 @@ import {
   Crown,
   Rocket,
   PartyPopper,
+  Moon,
 } from 'lucide-react'
 import {
   LogInjectionModal,
   LogWeightModal,
   LogEnergyModal,
+  LogSleepModal,
 } from '@/components/dashboard/modals'
 
 // Import gamification config
@@ -191,6 +193,7 @@ export default function DashboardPage() {
   const [isInjectionModalOpen, setIsInjectionModalOpen] = useState(false)
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false)
   const [isEnergyModalOpen, setIsEnergyModalOpen] = useState(false)
+  const [isSleepModalOpen, setIsSleepModalOpen] = useState(false)
   const [prefilledPeptide, setPrefilledPeptide] = useState<string | undefined>()
   const [quote] = useState(() => getRandomQuote())
   const [showCelebration, setShowCelebration] = useState(false)
@@ -680,7 +683,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Actions - Simplified & Motivational */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Button
             variant="outline"
             className="h-auto py-6 flex-col bg-slate-800/50 border-slate-700/50 hover:bg-primary-500/10 hover:border-primary-500/50 group"
@@ -712,6 +715,17 @@ export default function DashboardPage() {
               <Zap className="w-6 h-6 text-secondary-400" />
             </div>
             <span className="font-medium">Log Energy</span>
+            <span className="text-xs text-slate-500">+25 XP</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-6 flex-col bg-slate-800/50 border-slate-700/50 hover:bg-indigo-500/10 hover:border-indigo-500/50 group"
+            onClick={() => setIsSleepModalOpen(true)}
+          >
+            <div className="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center mb-2 group-hover:bg-indigo-500/20 transition-colors">
+              <Moon className="w-6 h-6 text-indigo-400" />
+            </div>
+            <span className="font-medium">Log Sleep</span>
             <span className="text-xs text-slate-500">+25 XP</span>
           </Button>
           <Button
@@ -758,6 +772,10 @@ export default function DashboardPage() {
       <LogEnergyModal
         open={isEnergyModalOpen}
         onOpenChange={setIsEnergyModalOpen}
+      />
+      <LogSleepModal
+        open={isSleepModalOpen}
+        onOpenChange={setIsSleepModalOpen}
       />
     </>
   )
