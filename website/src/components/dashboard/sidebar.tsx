@@ -13,12 +13,14 @@ import {
   BookOpen,
   Settings,
   HelpCircle,
+  Calculator,
 } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Protocols', href: '/dashboard/protocols', icon: ClipboardList },
   { name: 'Injections', href: '/dashboard/injections', icon: Syringe },
+  { name: 'Calculator', href: '/dashboard/calculator', icon: Calculator },
   { name: 'Health Tracking', href: '/dashboard/tracking', icon: Activity },
   { name: 'Shop', href: '/dashboard/shop', icon: ShoppingBag },
   { name: 'Learn', href: '/dashboard/learn', icon: BookOpen },
