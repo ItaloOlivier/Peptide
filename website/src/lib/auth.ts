@@ -8,7 +8,7 @@ const users = [
     id: '1',
     name: 'Demo User',
     email: 'demo@peptide.app',
-    password: '$2a$10$8KxD8fKZVQpWvXqGXwvZAO7.kEBJJ5bDv5mN0yW0xBqD5.8xGzKZm', // "demo123"
+    password: '$2b$10$jCgDhsoizOTnUBOonHnoQewe44STQmL2juhENWOmWEW433257Wuy6', // "demo123"
     image: null,
   },
 ]
