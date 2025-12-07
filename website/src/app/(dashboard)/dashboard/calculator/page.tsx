@@ -33,6 +33,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Lightbulb,
+  PenTool,
 } from 'lucide-react'
 
 // Peptide data with beginner-friendly descriptions
@@ -338,6 +339,10 @@ export default function CalculatorPage() {
   const [goal, setGoal] = useState<Goal>('standard')
   const [experienceLevel, setExperienceLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner')
 
+  // Injection method state
+  const [injectionMethod, setInjectionMethod] = useState<'syringe' | 'pen'>('syringe')
+  const [penDosePerClick, setPenDosePerClick] = useState<string>('0.05') // ml per click (common: 0.025, 0.05, 0.1)
+
   // Calculate recommended dose
   const recommendedDose = useMemo(() => {
     if (!selectedPeptide.dosing || !bodyWeight || !age) return null
@@ -402,14 +407,26 @@ export default function CalculatorPage() {
     const injectionUnits = injectionVolumeMl * 100
     const dosesPerVial = waterMl / injectionVolumeMl
 
+    // Pen click calculations
+    const mlPerClick = parseFloat(penDosePerClick) || 0.05
+    const penClicks = injectionVolumeMl / mlPerClick
+    const penClicksRounded = Math.round(penClicks)
+    const penActualDose = penClicksRounded * mlPerClick * concentrationMcgMl
+    const penDoseAccuracy = ((penActualDose / doseMcg) * 100)
+
     return {
       concentrationMgMl,
       concentrationMcgMl,
       injectionVolumeMl,
       injectionUnits,
       dosesPerVial,
+      penClicks,
+      penClicksRounded,
+      penActualDose,
+      penDoseAccuracy,
+      mlPerClick,
     }
-  }, [peptideAmount, waterVolume, desiredDose, doseUnit])
+  }, [peptideAmount, waterVolume, desiredDose, doseUnit, penDosePerClick])
 
   const handlePresetSelect = (preset: typeof peptidePresets[0]) => {
     setSelectedPeptide(preset)
@@ -438,15 +455,22 @@ export default function CalculatorPage() {
     setGender('male')
     setGoal('standard')
     setExperienceLevel('beginner')
+    setInjectionMethod('syringe')
+    setPenDosePerClick('0.05')
   }
 
   const handleCopyResults = () => {
     if (!calculations) return
 
+    const injectionInfo = injectionMethod === 'syringe'
+      ? `Draw: ${calculations.injectionUnits.toFixed(1)} units on insulin syringe`
+      : `Pen clicks: ${calculations.penClicksRounded} clicks (${calculations.mlPerClick}ml per click)`
+
     const text = `My ${selectedPeptide.name} Dosage
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Dose: ${desiredDose} ${doseUnit}
-Draw: ${calculations.injectionUnits.toFixed(1)} units on insulin syringe
+${injectionInfo}
+Volume: ${calculations.injectionVolumeMl.toFixed(3)}ml
 Frequency: ${selectedPeptide.frequency}
 Doses per vial: ~${Math.floor(calculations.dosesPerVial)}
 
@@ -931,6 +955,74 @@ ${peptideAmount}mg peptide + ${waterVolume}ml water`
             </CardContent>
           </Card>
 
+          {/* Injection Method Selector */}
+          <Card className="bg-slate-800/50 border-slate-700/50">
+            <CardContent className="p-6">
+              <h3 className="font-medium text-white mb-4 flex items-center gap-2">
+                <Syringe className="w-5 h-5 text-primary-400" />
+                How will you inject?
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setInjectionMethod('syringe')}
+                  className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
+                    injectionMethod === 'syringe'
+                      ? 'bg-primary-500/20 border-primary-500/50 text-primary-400'
+                      : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
+                  }`}
+                >
+                  <Syringe className="w-8 h-8" />
+                  <div>
+                    <p className="font-medium">Insulin Syringe</p>
+                    <p className="text-xs text-slate-500">Standard 100 unit syringe</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setInjectionMethod('pen')}
+                  className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
+                    injectionMethod === 'pen'
+                      ? 'bg-secondary-500/20 border-secondary-500/50 text-secondary-400'
+                      : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
+                  }`}
+                >
+                  <PenTool className="w-8 h-8" />
+                  <div>
+                    <p className="font-medium">Injection Pen</p>
+                    <p className="text-xs text-slate-500">Click-based dosing</p>
+                  </div>
+                </button>
+              </div>
+
+              {/* Pen settings */}
+              {injectionMethod === 'pen' && (
+                <div className="mt-4 p-4 bg-slate-900/50 rounded-xl border border-slate-700/50">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-3">
+                    Volume per click
+                    <Tooltip content="Check your pen's specifications. Common pens deliver 0.025ml, 0.05ml, or 0.1ml per click. NovaNAD pens typically use 0.05ml per click.">
+                      <HelpCircle className="w-4 h-4 text-slate-500" />
+                    </Tooltip>
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {['0.025', '0.05', '0.1', '0.2'].map((vol) => (
+                      <button
+                        key={vol}
+                        onClick={() => setPenDosePerClick(vol)}
+                        className={`p-3 rounded-lg border transition-all text-center ${
+                          penDosePerClick === vol
+                            ? 'bg-secondary-500/20 border-secondary-500/50 text-secondary-400'
+                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600'
+                        }`}
+                      >
+                        <div className="text-lg font-bold">{vol}</div>
+                        <div className="text-xs">ml/click</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Final Result - How much to inject */}
           {calculations && (
             <Card className="bg-gradient-to-br from-accent-500/20 to-primary-500/20 border-accent-500/30">
@@ -951,40 +1043,108 @@ ${peptideAmount}mg peptide + ${waterVolume}ml water`
                   </Button>
                 </div>
 
-                {/* Big number */}
-                <div className="text-center mb-6">
-                  <p className="text-slate-400 mb-2">Draw this much on your insulin syringe:</p>
-                  <div className="text-6xl sm:text-7xl font-bold text-white">
-                    {calculations.injectionUnits.toFixed(1)}
-                  </div>
-                  <p className="text-2xl text-slate-400">units</p>
-                </div>
-
-                {/* Visual syringe */}
-                <div className="mb-6">
-                  <div className="relative h-12 bg-slate-900 rounded-full overflow-hidden border-2 border-slate-700">
-                    <div
-                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-accent-500 to-accent-400 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(calculations.injectionUnits, 100)}%` }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-between px-4">
-                      {[0, 25, 50, 75, 100].map((mark) => (
-                        <div key={mark} className="flex flex-col items-center">
-                          <div className="w-0.5 h-4 bg-slate-600" />
-                          <span className="text-xs text-slate-500 mt-1">{mark}</span>
-                        </div>
-                      ))}
+                {/* Syringe Display */}
+                {injectionMethod === 'syringe' && (
+                  <>
+                    {/* Big number */}
+                    <div className="text-center mb-6">
+                      <p className="text-slate-400 mb-2">Draw this much on your insulin syringe:</p>
+                      <div className="text-6xl sm:text-7xl font-bold text-white">
+                        {calculations.injectionUnits.toFixed(1)}
+                      </div>
+                      <p className="text-2xl text-slate-400">units</p>
                     </div>
-                    {/* Marker for injection point */}
-                    <div
-                      className="absolute top-0 bottom-0 w-1 bg-white shadow-lg"
-                      style={{ left: `${Math.min(calculations.injectionUnits, 100)}%` }}
-                    />
-                  </div>
-                  <p className="text-center text-sm text-slate-400 mt-3">
-                    Fill your syringe to the <span className="text-accent-400 font-semibold">{calculations.injectionUnits.toFixed(1)}</span> mark
-                  </p>
-                </div>
+
+                    {/* Visual syringe */}
+                    <div className="mb-6">
+                      <div className="relative h-12 bg-slate-900 rounded-full overflow-hidden border-2 border-slate-700">
+                        <div
+                          className="absolute left-0 top-0 h-full bg-gradient-to-r from-accent-500 to-accent-400 rounded-full transition-all duration-500"
+                          style={{ width: `${Math.min(calculations.injectionUnits, 100)}%` }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-between px-4">
+                          {[0, 25, 50, 75, 100].map((mark) => (
+                            <div key={mark} className="flex flex-col items-center">
+                              <div className="w-0.5 h-4 bg-slate-600" />
+                              <span className="text-xs text-slate-500 mt-1">{mark}</span>
+                            </div>
+                          ))}
+                        </div>
+                        {/* Marker for injection point */}
+                        <div
+                          className="absolute top-0 bottom-0 w-1 bg-white shadow-lg"
+                          style={{ left: `${Math.min(calculations.injectionUnits, 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-center text-sm text-slate-400 mt-3">
+                        Fill your syringe to the <span className="text-accent-400 font-semibold">{calculations.injectionUnits.toFixed(1)}</span> mark
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Pen Display */}
+                {injectionMethod === 'pen' && (
+                  <>
+                    {/* Big number */}
+                    <div className="text-center mb-6">
+                      <p className="text-slate-400 mb-2">Click your pen this many times:</p>
+                      <div className="text-6xl sm:text-7xl font-bold text-white">
+                        {calculations.penClicksRounded}
+                      </div>
+                      <p className="text-2xl text-slate-400">clicks</p>
+                    </div>
+
+                    {/* Visual pen clicks */}
+                    <div className="mb-6">
+                      <div className="flex flex-wrap justify-center gap-2 mb-4">
+                        {Array.from({ length: Math.min(calculations.penClicksRounded, 20) }).map((_, i) => (
+                          <div
+                            key={i}
+                            className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary-500 to-secondary-400 flex items-center justify-center text-white text-sm font-bold shadow-lg animate-pulse"
+                            style={{ animationDelay: `${i * 100}ms` }}
+                          >
+                            {i + 1}
+                          </div>
+                        ))}
+                        {calculations.penClicksRounded > 20 && (
+                          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 text-xs">
+                            +{calculations.penClicksRounded - 20}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Dose accuracy info */}
+                      <div className={`p-3 rounded-lg text-center ${
+                        Math.abs(calculations.penDoseAccuracy - 100) <= 5
+                          ? 'bg-emerald-500/10 border border-emerald-500/20'
+                          : 'bg-amber-500/10 border border-amber-500/20'
+                      }`}>
+                        <p className="text-sm">
+                          {Math.abs(calculations.penDoseAccuracy - 100) <= 5 ? (
+                            <span className="text-emerald-400">
+                              <CheckCircle2 className="w-4 h-4 inline mr-1" />
+                              Accurate dose: {calculations.penClicksRounded} clicks = {(calculations.penClicksRounded * calculations.mlPerClick * calculations.concentrationMcgMl).toFixed(1)} {doseUnit}
+                            </span>
+                          ) : (
+                            <span className="text-amber-400">
+                              <AlertTriangle className="w-4 h-4 inline mr-1" />
+                              {calculations.penClicksRounded} clicks delivers {(calculations.penClicksRounded * calculations.mlPerClick * calculations.concentrationMcgMl).toFixed(1)} {doseUnit} ({calculations.penDoseAccuracy.toFixed(0)}% of target)
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Pen tip */}
+                    <div className="flex items-start gap-2 p-3 bg-secondary-500/10 rounded-lg border border-secondary-500/20 mb-4">
+                      <Lightbulb className="w-5 h-5 text-secondary-400 shrink-0 mt-0.5" />
+                      <p className="text-sm text-slate-300">
+                        <span className="text-secondary-400 font-medium">Pen Tip:</span> Each click is {penDosePerClick}ml. Listen for the click sound to confirm each dose delivery.
+                      </p>
+                    </div>
+                  </>
+                )}
 
                 {/* Additional info */}
                 <div className="grid sm:grid-cols-3 gap-4">
